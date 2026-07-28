@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "catalogId": "https://a2ui.org/catalog/currency-charts",
+  "name": "currency-charts",
+  "components": {
+    "BarChart": {
+      "description": "Renders a custom vertical bar chart for showing historical rates.",
+      "properties": {
+        "title": { "type": "string" },
+        "labels": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "values": {
+          "type": "array",
+          "items": { "type": "number" }
+        },
+        "color": { "type": "string", "default": "#10b981" }
+      },
+      "required": ["labels", "values"]
+    },
+    "LineChart": {
+      "description": "Renders a custom SVG line chart with gradients for showing historical rates.",
+      "properties": {
+        "title": { "type": "string" },
+        "labels": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "values": {
+          "type": "array",
+          "items": { "type": "number" }
+        },
+        "color": { "type": "string", "default": "#3b82f6" }
+      },
+      "required": ["labels", "values"]
+    }
+  }
+}

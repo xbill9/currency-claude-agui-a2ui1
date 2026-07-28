@@ -1,0 +1,14 @@
+uvicorn
+fastapi
+httpx
+httpx_sse
+google-genai
+google-cloud-logging
+opentelemetry-exporter-gcp-trace
+opentelemetry-api
+opentelemetry-sdk
+google-adk
+google-auth
+pydantic
+python-json-logger
+a2a-sdk

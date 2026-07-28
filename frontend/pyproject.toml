@@ -1,0 +1,26 @@
+[project]
+name = "course-creation-app"
+version = "0.1.0"
+description = "Course Creation Web App"
+requires-python = ">=3.13"
+dependencies = [
+    "uvicorn",
+    "python-json-logger",
+    "fastapi",
+    "httpx",
+    "httpx_sse",
+    "google-genai",
+    "google-cloud-logging",
+    "opentelemetry-exporter-gcp-trace",
+    "google-adk",
+    "google-auth",
+]
+
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]
+include = ["main.py", "authenticated_httpx.py", "frontend/"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
