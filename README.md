@@ -1,4 +1,4 @@
-# 💵💱💶 Currency Agent (A2A + ADK + MCP)
+# 💵💱💶 Currency Agent (A2A + ADK + MCP + A2UI 1.0)
 
 [![Open In Codelab][codelab-badge]][codelab]
 [![Python](https://img.shields.io/badge/Python-3.x-blue.svg)](https://www.python.org/)
@@ -13,6 +13,24 @@ A sample agent demonstrating A2A + ADK + MCP + A2UI working together. It leverag
 Both A2A and ADK were [announced at Google I/O 2025](https://developers.googleblog.com/en/agents-adk-agent-engine-a2a-enhancements-google-io/).
 
 ![Architecture Overview](images/architecture.png)
+
+#### A2UI 1.0: Express and Server-Side Macros
+
+This copy of `currency-claude-agui` runs on [A2UI 1.0](https://a2ui.org): `a2ui-agent-sdk` 0.11.0, `a2ui-adk` 0.3.0 and `a2ui-core` 0.6.0 on the agent, `@a2ui/react` 0.15.0 and `@a2ui/web_core/v1_0` in the React UI.
+
+- **Express inference format.** The model writes compact `<a2ui>` blocks, which `A2uiRequestProcessor` compiles and validates into v1.0 messages (`createSurface` with embedded components, `{"@path": ...}` bindings).
+- **Server-side macros** (`currency_agent/macros.py`). `RateCard(from, to, amount)` and `RateHistoryChart(from, to, days)` are components the model calls in one line. `MacroExpander` runs them on the agent, where they fetch the rates from the Frankfurter API and expand into Basic catalog `Card`/`Column`/`Text` plus the custom `LineChart`. The rate figures never pass through the model's context.
+- **Custom catalog in v1.0 form** (`currency_agent/custom_catalog.json`, `protocolVersion: "1.0"`), mixed with the Basic catalog on one surface.
+- **React renderer.** `send_a2ui_json_to_client` results are rendered by `@a2ui/react` with a per-turn `MessageProcessor` (`frontend-react/src/components/A2uiMessages.tsx`). CopilotKit's built-in A2UI middleware speaks v0.9, so it is turned off.
+
+Measured with `gemini-2.5-flash` on 2026-11-11, one run each:
+
+| Question | Model output | Output tokens | Rendered |
+|---|---|---|---|
+| How much is 250 USD in EUR? | `root = RateCard(currency_from="USD", currency_to="EUR", amount=250, ...)` | 77 | Card: 250.00 USD = 224.68 EUR |
+| USD to JPY trend, last 30 days | `root = RateHistoryChart("USD", "JPY", 30, ...)` | 70 | Card with a 30-day line chart |
+
+The vanilla `frontend/` (FastAPI + TS) was not migrated or tested against 1.0 messages.
 
 ## Overview
 

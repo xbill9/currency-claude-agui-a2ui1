@@ -1,7 +1,7 @@
 [project]
 name = "currency-agent"
 version = "0.1.0"
-description = "Currency conversion agent using ADK, MCP and A2A"
+description = "Currency conversion agent using ADK, MCP, A2A and A2UI 1.0"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
@@ -11,7 +11,9 @@ dependencies = [
     "google-genai>=1.17.0",
     "python-dotenv>=1.1.0",
     "httpx>=0.28.0",
-    "a2ui-agent-sdk>=0.2.1",
+    "a2ui-agent-sdk>=0.11.0",
+    "a2ui-adk[a2a]>=0.3.0",
+    "a2ui-core>=0.6.0",
     "opentelemetry-semantic-conventions>=0.62b1",
     "python-json-logger>=2.0.0",
     "fastapi",

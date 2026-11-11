@@ -1,39 +1,41 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "catalogId": "https://a2ui.org/catalog/currency-charts",
-  "name": "currency-charts",
+  "catalogId": "https://a2ui.org/catalog/currency-charts/v1/catalog.json",
+  "protocolVersion": "1.0",
   "components": {
     "BarChart": {
-      "description": "Renders a custom vertical bar chart for showing historical rates.",
+      "type": "object",
+      "description": "Renders a vertical bar chart for comparing exchange rates.",
       "properties": {
+        "component": { "const": "BarChart" },
         "title": { "type": "string" },
-        "labels": {
-          "type": "array",
-          "items": { "type": "string" }
-        },
-        "values": {
-          "type": "array",
-          "items": { "type": "number" }
-        },
-        "color": { "type": "string", "default": "#10b981" }
+        "labels": { "type": "array", "items": { "type": "string" } },
+        "values": { "type": "array", "items": { "type": "number" } },
+        "color": { "type": "string" }
       },
-      "required": ["labels", "values"]
+      "required": ["component", "labels", "values"]
     },
     "LineChart": {
-      "description": "Renders a custom SVG line chart with gradients for showing historical rates.",
+      "type": "object",
+      "description": "Renders an SVG line chart for showing exchange rate history over time.",
       "properties": {
+        "component": { "const": "LineChart" },
         "title": { "type": "string" },
-        "labels": {
-          "type": "array",
-          "items": { "type": "string" }
-        },
-        "values": {
-          "type": "array",
-          "items": { "type": "number" }
-        },
-        "color": { "type": "string", "default": "#3b82f6" }
+        "labels": { "type": "array", "items": { "type": "string" } },
+        "values": { "type": "array", "items": { "type": "number" } },
+        "color": { "type": "string" }
       },
-      "required": ["labels", "values"]
+      "required": ["component", "labels", "values"]
     }
+  },
+  "$defs": {
+    "anyComponent": {
+      "oneOf": [
+        { "$ref": "#/components/BarChart" },
+        { "$ref": "#/components/LineChart" }
+      ],
+      "discriminator": { "propertyName": "component" }
+    },
+    "anyFunction": { "not": {} }
   }
 }

@@ -10,13 +10,12 @@ import { HttpAgent } from "@ag-ui/client";
 const runtime = new CopilotRuntime({
   agents: {
     currency_agent: new HttpAgent({
-      url: process.env.AGENT_URL || "http://localhost:11000/apps/currency_agent",
+      url: process.env.AGENT_URL || "http://localhost:8008/",
     }),
   },
   runner: new InMemoryAgentRunner(),
-  a2ui: {
-    a2uiToolNames: ["render_a2ui", "send_a2ui_json_to_client"],
-  },
+  // A2UI 1.0 is rendered client-side by @a2ui/react (see A2uiMessages.tsx);
+  // CopilotKit's built-in A2UI middleware speaks v0.9, so it is not enabled.
 });
 
 const multiRouteHandler = createCopilotRuntimeHandler({

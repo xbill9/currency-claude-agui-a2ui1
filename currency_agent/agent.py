@@ -23,69 +23,97 @@ from google.adk.tools.mcp_tool import McpToolset, StreamableHTTPConnectionParams
 from starlette.responses import JSONResponse
 
 
-# A2UI imports
-from a2ui.schema.manager import A2uiSchemaManager
-from a2ui.basic_catalog.provider import BasicCatalog
-from a2ui.adk.send_a2ui_to_client_toolset import (
-    SendA2uiToClientToolset,
-    A2uiPartConverter,
-)
+# A2UI 1.0 imports
+from a2ui.adk import SendA2uiToClientToolset
+from a2ui.adk.a2a import A2uiPartConverter
+from a2ui.core.basic_catalog import BasicCatalog
+from a2ui.core.schema import AgentToRendererMessage
+from a2ui.processor import A2uiRequestProcessor
+from a2ui.transformers.macros import MacroExpander
+from a2ui.utils import validate_payload
+from pydantic import TypeAdapter
 from google.adk.a2a.executor.a2a_agent_executor import (
     A2aAgentExecutor,
     A2aAgentExecutorConfig,
 )
+
+from currency_agent.macros import CHARTS_CATALOG, MACROS
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(format="[%(levelname)s]: %(message)s", level=logging.INFO)
 
 load_dotenv()
 
-from a2ui.schema.catalog import CatalogConfig
+# --- A2UI 1.0 setup ---------------------------------------------------------
+# Transport catalogs: what the renderer implements (Basic 1.0 + currency charts).
+BASE_CATALOGS = [BasicCatalog("1.0"), CHARTS_CATALOG]
 
-# Set up A2UI schema manager and catalogs
-schema_manager = A2uiSchemaManager(
-    version="0.9",
-    catalogs=[
-        BasicCatalog.get_config("0.9"),
-        CatalogConfig.from_path(
-            name="currency-charts",
-            catalog_path=os.path.join(os.path.dirname(__file__), "custom_catalog.json"),
-        ),
-    ],
-)
-selected_catalog = schema_manager.get_selected_catalog()
-examples_str = schema_manager.load_examples(selected_catalog)
+# Server-side macros: the model sees RateCard(...) / RateHistoryChart(...) as
+# components; the expander runs them here and sends flat catalog components.
+macro_expander = MacroExpander(MACROS, on_error="raise")
+INFERENCE_CATALOGS = macro_expander.transform_catalogs(BASE_CATALOGS)
 
-# Generate system prompt instruction with A2UI component catalog schema and examples
-SYSTEM_INSTRUCTION = schema_manager.generate_system_prompt(
-    role_description=(
-        "You are a specialized assistant for currency conversions. "
-        "Your sole purpose is to use the 'get_exchange_rate' tool to answer questions about currency exchange rates. "
-        "If the user asks about anything other than currency conversion or exchange rates, "
-        "politely state that you cannot help with that topic and can only assist with currency-related queries. "
-        "Do not attempt to answer unrelated questions or use tools for other purposes."
-    ),
-    workflow_description="Use components to display structured currency conversions and rates.",
-    ui_description="Use Card and Text components for displaying rates. Use Table components for tabular data. Use BarChart components or LineChart components when presenting exchange rate trends or histories over time.",
-    include_schema=True,
-    include_examples=True,
-    allowed_components=["Card", "Text", "Table", "BarChart", "LineChart"],
+# A2uiRequestProcessor uses the A2UI Express inference format by default.
+a2ui_processor = A2uiRequestProcessor(catalogs=INFERENCE_CATALOGS)
+
+ROLE_INSTRUCTION = (
+    "You are a specialized assistant for currency conversions. "
+    "Use the 'get_exchange_rate' tool to answer questions about currency exchange rates. "
+    "If the user asks about anything other than currency conversion or exchange rates, "
+    "politely state that you cannot help with that topic and can only assist with currency-related queries. "
+    "Do not attempt to answer unrelated questions or use tools for other purposes.\n\n"
+    "Show results as A2UI. Prefer the server-side macros: RateCard for a rate or a "
+    "conversion, RateHistoryChart for trends or history over time. These macros look "
+    "up the figures on the server, so pass only currency codes and the amount or day "
+    "count. Use Basic catalog components (Card, Column, Row, Text) or BarChart only "
+    "for layouts the macros do not cover, such as comparing several currencies."
 )
 
-logger.info("--- 🤖 Creating ADK Currency Agent... ---")
+_message_adapter: TypeAdapter[AgentToRendererMessage] = TypeAdapter(
+    AgentToRendererMessage
+)
+
+
+class MacroSendA2uiToClientToolset(SendA2uiToClientToolset):
+    """SendA2uiToClientToolset that expands A2UI 1.0 server-side macros.
+
+    The stock tool compiles the model's Express payload and validates it
+    against the inference catalogs (which include the macro sidecar). This
+    subclass then runs the macros and re-validates the expanded messages against
+    the catalogs the renderer actually implements.
+    """
+
+    class _MacroTool(SendA2uiToClientToolset._SendA2uiJsonToClientTool):
+        def _parse_payload(self, processor, payload):
+            messages = super()._parse_payload(processor, payload)
+            typed = [_message_adapter.validate_python(m) for m in messages]
+            expanded = macro_expander.transform_to_transport(typed)
+            wire = [
+                m.model_dump(by_alias=True, exclude_none=True) for m in expanded
+            ]
+            validate_payload(BASE_CATALOGS, wire)
+            return wire
+
+    def __init__(self, a2ui_enabled, a2ui_processor):
+        super().__init__(a2ui_enabled=a2ui_enabled, a2ui_processor=a2ui_processor)
+        self._ui_tool = self._MacroTool(a2ui_processor)
+        self._ui_tools = [self._ui_tool]
+
+
+logger.info("--- 🤖 Creating ADK Currency Agent (A2UI 1.0, Express + macros) ---")
 logger.info(f"MCP_SERVER_URL: {os.getenv('MCP_SERVER_URL')}")
 
-a2ui_toolset = SendA2uiToClientToolset(
+# The toolset appends the processor's Express prompt snippet to the instruction.
+a2ui_toolset = MacroSendA2uiToClientToolset(
     a2ui_enabled=True,
-    a2ui_catalog=selected_catalog,
-    a2ui_examples=examples_str,
+    a2ui_processor=a2ui_processor,
 )
 
 root_agent = LlmAgent(
     model=os.getenv("GENAI_MODEL", "gemini-2.5-flash"),
     name="currency_agent",
     description="An agent that can help with currency conversions",
-    instruction=SYSTEM_INSTRUCTION,
+    instruction=ROLE_INSTRUCTION,
     tools=[
         a2ui_toolset,
         McpToolset(
@@ -101,7 +129,7 @@ root_agent = LlmAgent(
 def agent_executor_factory(runner):
     config = A2aAgentExecutorConfig(
         gen_ai_part_converter=A2uiPartConverter(
-            selected_catalog, bypass_tool_check=True
+            a2ui_processor, bypass_tool_check=True
         ).convert
     )
     return A2aAgentExecutor(runner=runner, config=config)
