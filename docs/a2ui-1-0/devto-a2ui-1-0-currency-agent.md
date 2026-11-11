@@ -357,4 +357,4 @@ The strategy for moving a generative UI agent to A2UI 1.0 with server-side macro
 - Google Agent Development Kit: https://github.com/google/adk-python
 - Model Context Protocol: https://modelcontextprotocol.io
 - Frankfurter API: https://www.frankfurter.dev
-- Currency Agent codelab: https://codelabs.developers.google.com/codelabs/currency-agent
+- The upstream Currency Agent (A2A + ADK + MCP): https://github.com/jackwotherspoon/currency-agent
