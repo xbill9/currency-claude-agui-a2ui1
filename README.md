@@ -1,27 +1,51 @@
-# 💵💱💶 Currency Agent (A2A + ADK + MCP + A2UI 1.0)
+# 💵💱💶 Currency Agent: ADK + MCP + A2UI 1.0 over AG-UI and A2A
 
 [![Open In Codelab][codelab-badge]][codelab]
-[![Python](https://img.shields.io/badge/Python-3.x-blue.svg)](https://www.python.org/)
-[![Framework](https://img.shields.io/badge/Framework-ADK-4285F4.svg?logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAhGVYSWZNTQAqAAAACAAFARIAAwAAAAEAAQAAARoABQAAAAEAAABKARsABQAAAAEAAABSASgAAwAAAAEAAgAAh2kABAAAAAEAAABaAAAAAAAAAEgAAAABAAAASAAAAAEAA6ABAAMAAAABAAEAAKACAAQAAAABAAAADqADAAQAAAABAAAADgAAAABOylT5AAAACXBIWXMAAAsTAAALEwEAmpwYAAABWWlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iWE1QIENvcmUgNi4wLjAiPgogICA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPgogICAgICA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIgogICAgICAgICAgICB4bWxuczp0aWZmPSJodHRwOi8vbnMuYWRvYmUuY29tL3RpZmYvMS4wLyI+CiAgICAgICAgIDx0aWZmOk9yaWVudGF0aW9uPjE8L3RpZmY6T3JpZW50YXRpb24+CiAgICAgIDwvcmRmOkRlc2NyaXB0aW9uPgogICA8L3JkZjpSREY+CjwveDp4bXBtZXRhPgoZXuEHAAACRUlEQVQoFXVSS2gTQRj+Z3aziUlF1ISkRqqpVpCaixgkkEOaUGktBopuRQXxKF68pIdCpSsYH4gWxINHT8ZmVUR7MaRND4pUFBFfB7GXqt1iAlGS5rn7O7NpFg/6HeZ/zPfN/PMxAOtQFKSd/L8RFYtDOEmWUVBVovM8fgHDDc+iv+I9VxcgAAhdEtUbP16dTL80uRlZUMdUnXREPBb3/7pDm65g1f3iS9094QRjOwBZWwO09REQ3++kD86qY6DLTAydEWOXy8lYqpzjp/4LB+4fzYVmjiXNPTYyVRRi8IIgRijqk4eua65YqnJLzqDA+wPXijdOALpbzocTaHRFeA+IYliPZaVGCD2cHfdVCJRT6lj7zS1dupoGUhCrsREgVc0Ucm1UQXFBIa3IlVJvU5ceiQTmNyPmddR9DbAZur28Wt1xJi4YjiFq2Eeen7q3FM1HGY2DGQPM1dM3C/5izZ6sGdA9Jzm1YAOc2xzfNj3bNfUJ9t2dhj74DRkQgBlk6vhSy+49b8zBG1wBD69xD4wiQI+Zg/dIHUL97Twq8mi9UaSfo03snSXd8HMlkbitBYbGPxyftHHS99HdW0qDkC4MhOIEFlqoALWEhuGoEVia5UQbLCdoffVdcObSV15v1EpPmfdbkWDbVdazhJQ2KwSlx7gIAfeTtz1EEv3F+MFBLqw7nVNIYNoz//oiG5+Cwj4UIpgGYR58tayQwJzLy8kcODxs53E5HN7AI4fy12WW2Nxhy0e5X+rk7Ia286yBMvtq6/gDb7bjW6TkRnEAAAAASUVORK5CYII=)](https://github.com/google/adk-python)
+[![Python](https://img.shields.io/badge/Python-3.13+-blue.svg)](https://www.python.org/)
+[![Framework](https://img.shields.io/badge/Framework-Google_ADK-4285F4.svg)](https://github.com/google/adk-python)
+[![A2UI](https://img.shields.io/badge/A2UI-1.0-10b981.svg)](https://a2ui.org)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
-[codelab-badge]: https://img.shields.io/badge/Open%20In%20Codelab-blue?labelColor=grey&style=flat&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAyVBMVEX////////////////////////+8/L0oZrrTkHqQzXzlY13yKEPnVgdo2KHzqvw+fX4xMDtWk604MssqWz73NnvcWdKtYHS7eD85+ZowpayncOWapvVS0360MzD5tWW1LZxo/dChfSLaKHfR0FMhe2rY4TyiYBlm/bQ4Pz+7sD7xCPPthRJpkegwvl9q/fn8P7+9+D80VL7vASisCQsoU4spV393YHPwDm40ftNjPX7wBP95qHz9/7/++/b6P3+8tD8zUKIsvj81WJbutStAAAABnRSTlMAIKDw/zDiNY+eAAAA+klEQVR4AbzRRYICMRRF0VB5QLlrO+7uDvvfVKfSv91mnGlunDFWUDh+xJUCE4ocv+JFMZ/jD7zAFPxJYRx/4gz/uGpQKquaDsEwLdv5HrieJriAbwqB/yUII00qA7YpxcmHoKRrJAUSk2QOKLi5vdMk7x7CQ0CF9fgSPFUqlWpN09QyiG1REsugkqs3miW8cTIqHApyrTbedLq9vgzkCoMKGY4gjSdTYTY3F74M0G5VyADCckpWnbd3WG+oaAMdGt7uPj7UfvC2BC2wPIACMspvuzkCp60YPo9/+M328LKHcHiek6EmnRMMAUAw2RPMOASzHsHMSzD7AwCdmyeTDUqFKQAAAABJRU5ErkJggg==
+[codelab-badge]: https://img.shields.io/badge/Open%20In%20Codelab-blue?labelColor=grey&style=flat
 [codelab]: https://codelabs.developers.google.com/codelabs/currency-agent
 
-A sample agent demonstrating A2A + ADK + MCP + A2UI working together. It leverages the new **Agent2Agent (A2A) Python SDK** ([`a2a-sdk`](https://github.com/google-a2a/a2a-python)), Google's **Agent Development Kit (ADK)** ([`google-adk`](https://github.com/google/adk-python) v2.1.0+), and the **Agent-to-User Interface (A2UI) SDK** (`a2ui-agent-sdk`).
+A currency conversion agent that answers with generated UI. Ask "How much is 250 USD in EUR?" and the agent replies with a rate card; ask for a trend and it draws a line chart. The agent runs on Google's [Agent Development Kit](https://github.com/google/adk-python) with Gemini, gets exchange rates from an [MCP](https://modelcontextprotocol.io) tool server, and describes its UI in [A2UI 1.0](https://a2ui.org). A Next.js + [CopilotKit](https://www.copilotkit.ai) front end renders it over [AG-UI](https://docs.ag-ui.com), and the same agent is also served over [A2A](https://github.com/a2aproject/A2A).
 
-Both A2A and ADK were [announced at Google I/O 2025](https://developers.googleblog.com/en/agents-adk-agent-engine-a2a-enhancements-google-io/).
+Builds on the [Currency Agent codelab](https://codelabs.developers.google.com/codelabs/currency-agent) (A2A + ADK + MCP).
 
-![Architecture Overview](images/architecture.png)
+---
 
-#### A2UI 1.0: Express and Server-Side Macros
+#### Architecture
 
-This copy of `currency-claude-agui` runs on [A2UI 1.0](https://a2ui.org): `a2ui-agent-sdk` 0.11.0, `a2ui-adk` 0.3.0 and `a2ui-core` 0.6.0 on the agent, `@a2ui/react` 0.15.0 and `@a2ui/web_core/v1_0` in the React UI.
+```mermaid
+flowchart LR
+    B["Browser<br/>Next.js + CopilotKit<br/>@a2ui/react · :3000"] -- "/api/copilotkit" --> G["AG-UI bridge<br/>frontend-react/agent · :8008"]
+    G --> AG["ADK agent<br/>currency_agent (Gemini)"]
+    C["A2A clients<br/>test_client.py · legacy frontend/"] -- "A2A" --> S["A2A server · :10000"] --> AG
+    AG -- "MCP (HTTP /mcp)" --> M["MCP server<br/>get_exchange_rate · :8080"]
+    AG -- "server-side macros" --> F[("Frankfurter API<br/>ECB rates")]
+    M --> F
+```
 
-- **Express inference format.** The model writes compact `<a2ui>` blocks, which `A2uiRequestProcessor` compiles and validates into v1.0 messages (`createSurface` with embedded components, `{"@path": ...}` bindings).
-- **Server-side macros** (`currency_agent/macros.py`). `RateCard(from, to, amount)` and `RateHistoryChart(from, to, days)` are components the model calls in one line. `MacroExpander` runs them on the agent, where they fetch the rates from the Frankfurter API and expand into Basic catalog `Card`/`Column`/`Text` plus the custom `LineChart`. The rate figures never pass through the model's context.
-- **Custom catalog in v1.0 form** (`currency_agent/custom_catalog.json`, `protocolVersion: "1.0"`), mixed with the Basic catalog on one surface.
-- **React renderer.** `send_a2ui_json_to_client` results are rendered by `@a2ui/react` with a per-turn `MessageProcessor` (`frontend-react/src/components/A2uiMessages.tsx`). CopilotKit's built-in A2UI middleware speaks v0.9, so it is turned off.
+| Service | Port | Code |
+|---|---|---|
+| MCP server: `get_exchange_rate` tool (FastMCP) | 8080, path `/mcp` | `mcp-server/` |
+| A2A server: the ADK agent over A2A, `/health` | 10000 | `currency_agent/` |
+| AG-UI bridge: the same agent in-process, `/health` | 8008 | `frontend-react/agent/` |
+| React UI: Next.js 16, CopilotKit 1.56, `@a2ui/react` | 3000 | `frontend-react/` |
+| Legacy UI: FastAPI + Vite, talks A2A | 8000 | `frontend/` |
+
+---
+
+#### How the UI is generated (A2UI 1.0)
+
+Libraries: `a2ui-agent-sdk` 0.11.0, `a2ui-adk` 0.3.0 and `a2ui-core` 0.6.0 on the agent; `@a2ui/react` 0.15.0 and `@a2ui/web_core/v1_0` in the React UI.
+
+- **Express inference format.** The model writes compact `<a2ui>` blocks. `A2uiRequestProcessor` compiles and validates them into v1.0 messages (`createSurface` with embedded components and `{"@path": ...}` bindings).
+- **Server-side macros** (`currency_agent/macros.py`). `RateCard(from, to, amount)` and `RateHistoryChart(from, to, days)` are components the model calls in one line. `MacroExpander` runs them on the agent, where they fetch rates from the Frankfurter API and expand into Basic catalog `Card`/`Column`/`Text` plus the custom `LineChart`. The rate figures never pass through the model's context, and the macros accept only three-letter currency codes and a clamped day range.
+- **Two validation passes.** The payload is checked against the inference catalogs (Basic + charts + macro definitions), then again after expansion against the catalogs the renderer implements (Basic 1.0 + charts).
+- **Custom catalog** (`currency_agent/custom_catalog.json`, `protocolVersion: "1.0"`) adds `LineChart` and `BarChart`. Its catalog id must match `frontend-react/src/components/A2UICustomCatalog.tsx`.
+- **React renderer.** Results of the `send_a2ui_json_to_client` tool are rendered by `@a2ui/react` with a per-turn `MessageProcessor` (`frontend-react/src/components/A2uiMessages.tsx`). CopilotKit's built-in A2UI middleware speaks v0.9, so it is turned off.
 
 Measured with `gemini-2.5-flash` on 2026-11-11, one run each:
 
@@ -30,244 +54,89 @@ Measured with `gemini-2.5-flash` on 2026-11-11, one run each:
 | How much is 250 USD in EUR? | `root = RateCard(currency_from="USD", currency_to="EUR", amount=250, ...)` | 77 | Card: 250.00 USD = 224.68 EUR |
 | USD to JPY trend, last 30 days | `root = RateHistoryChart("USD", "JPY", 30, ...)` | 70 | Card with a 30-day line chart |
 
-The vanilla `frontend/` (FastAPI + TS) was not migrated or tested against 1.0 messages.
+The legacy `frontend/` talks to the A2A server. Its renderer was written for A2UI before 1.0 and has not been tested against 1.0 messages.
 
-## Overview
+---
 
-The sample aims at laying out a foundation and showcasing the capabilities
-of A2A + ADK + MCP. It is a currency converter agent that can convert between different
-countries' currencies.
+#### Getting Started
 
-### <img height="20" width="20" src="images/mcp-favicon.ico" alt="MCP Logo" /> Model Context Protocol (MCP)
-
-> MCP is an open protocol that standardizes how applications provide context to LLMs. Think of MCP like a USB-C port for AI applications. Just as USB-C provides a standardized way to connect your devices to various peripherals and accessories, MCP provides a standardized way to connect AI models to different data sources and tools. - [Anthropic](https://modelcontextprotocol.io/introduction)
-
-The MCP server in this example exposes a tool `get_exchange_rate` that can be used to get the exchange rate between two currencies such as USD and EUR. It leverages the [Frankfurter](https://www.frankfurter.dev/) API to get the currency exchange rate. Our agent uses an MCP client to invoke this tool when needed.
-
-### <img height="20" width="20" src="images/adk-favicon.ico" alt="ADK Logo" /> Agent Development Kit (ADK)
-
-> ADK is a flexible and modular framework for developing and deploying AI agents. While optimized for Gemini and the Google ecosystem, ADK is model-agnostic, deployment-agnostic, and is built for compatibility with other frameworks. - [ADK](https://github.com/google/adk-python)
-
-ADK (v2.1.0+) is used as the orchestration framework for creating our currency agent in this sample. It handles the conversation with the user and invokes our MCP tool when needed.
-
-### <img height="20" width="20" src="https://a2aproject.github.io/A2A/v0.2.5/assets/a2a-logo-white.svg" alt="A2A Logo" /> Agent2Agent (A2A)
-
-> Agent2Agent (A2A) protocol addresses a critical challenge in the AI landscape: enabling gen AI agents, built on diverse frameworks by different companies running on separate servers, to communicate and collaborate effectively - as agents, not just as tools. A2A aims to provide a common language for agents, fostering a more interconnected, powerful, and innovative AI ecosystem. - [A2A](https://github.com/a2aproject/A2A)
-
-The new [A2A Python SDK](https://github.com/google-a2a/a2a-python) is used to create an A2A server that advertises and executes our ADK agent. We then run an A2A client that connects to our A2A server and invokes our ADK agent.
-
-### 🎨 Agent-to-User Interface (A2UI)
-
-> Agent-to-User Interface (A2UI) standardizes how agents supply layout, presentation, and interactive widgets back to the user-facing web application. Rather than outputting plain text or markdown tables, A2UI defines structured component JSON structures (like Cards, Tables, Columns, Rows, and Charts) that the web frontend can parse and render as highly polished, interactive UI cards.
-
-Our agent leverages the `a2ui-agent-sdk` library (configured via `A2uiSchemaManager`, `BasicCatalog`, `SendA2uiToClientToolset`, and `A2uiPartConverter`) to instruct the LLM on catalog components and convert generated layout descriptions. The user's web browser automatically interprets the returned `<a2ui-json>` elements and renders them dynamically. 
-
-## Getting Started
-
-### Prerequisites
-
-- Python 3.13+
-- Git, for cloning the repository.
-- Node.js & npm (for building the frontend web applications).
-
-### Installation
-
-1. Clone the repository:
+**Prerequisites:** Python 3.13+, Node.js and npm, and [uv](https://docs.astral.sh/uv/getting-started/installation) (the Makefile uses it).
 
 ```bash
-git clone https://github.com/jackwotherspoon/currency-agent.git
-cd currency-agent
+git clone https://github.com/xbill9/currency-claude-agui-a2ui1.git
+cd currency-claude-agui-a2ui1
+make install    # uv sync + npm install for both front ends
 ```
 
-2. Install [uv](https://docs.astral.sh/uv/getting-started/installation) (used to manage dependencies):
-
-```bash
-# macOS and Linux
-curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# Windows (uncomment below line)
-# powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
-```
-
-> [!NOTE]
-> You may need to restart or open a new terminal after installing `uv`.
-
-3. Configure environment variables (via `.env` file):
-
-There are two different ways to call Gemini models:
-
-- Calling the Gemini API directly using an API key created via Google AI Studio.
-- Calling Gemini models through Vertex AI APIs on Google Cloud.
-
-> [!TIP] 
-> An API key from Google AI Studio is the quickest way to get started.
-> 
-> Existing Google Cloud users may want to use Vertex AI.
-
-<details open>
-<summary>Gemini API Key</summary> 
-
-Get an API Key from Google AI Studio: https://aistudio.google.com/apikey
-
-Create a `.env` file by running the following (replace `<your_api_key_here>` with your API key):
+**Configure Gemini** in a `.env` file at the repo root. Either a Google AI Studio key ([get one](https://aistudio.google.com/apikey)):
 
 ```sh
-echo "GOOGLE_API_KEY=<your_api_key_here>" >> .env \
-&& echo "GOOGLE_GENAI_USE_VERTEXAI=FALSE" >> .env
+echo "GOOGLE_API_KEY=<your_api_key_here>" >> .env
+echo "GOOGLE_GENAI_USE_VERTEXAI=FALSE" >> .env
 ```
 
-</details>
+or Vertex AI on a Google Cloud project with `aiplatform.googleapis.com` enabled:
 
-<details>
-<summary>Vertex AI</summary>
-
-To use Vertex AI, you will need to [create a Google Cloud project](https://developers.google.com/workspace/guides/create-project) and [enable Vertex AI](https://cloud.google.com/vertex-ai/docs/start/cloud-environment).
-
-Authenticate and enable Vertex AI API:
-
-```bash
-gcloud auth login
-# Replace <your_project_id> with your project ID
-gcloud config set project <your_project_id>
-gcloud services enable aiplatform.googleapis.com
-```
-
-Create a `.env` file by running the following (replace `<your_project_id>` with your project ID):
 ```sh
-echo "GOOGLE_GENAI_USE_VERTEXAI=TRUE" >> .env \
-&& echo "GOOGLE_CLOUD_PROJECT=<your_project_id>" >> .env \
-&& echo "GOOGLE_CLOUD_LOCATION=us-central1" >> .env
+echo "GOOGLE_GENAI_USE_VERTEXAI=TRUE" >> .env
+echo "GOOGLE_CLOUD_PROJECT=<your_project_id>" >> .env
+echo "GOOGLE_CLOUD_LOCATION=us-central1" >> .env
 ```
 
-</details>
+The agent uses `gemini-2.5-flash` unless `GENAI_MODEL` is set in `.env`.
 
-> [!NOTE]
-> By default, the agent uses `gemini-2.5-flash`. You can configure the agent to use `gemini-3.5-flash` (or another supported model) by defining `GENAI_MODEL` in your `.env` file:
-> ```sh
-> GENAI_MODEL="gemini-3.5-flash"
-> ```
+---
 
-Now you are ready for the fun to begin!
-
-## Local Deployment
-
-You can manage all services using the provided `Makefile`.
-
-### Start all services
-
-To start the MCP Server, the A2A Agent, and the React UI / Agent services in the background:
+#### Running locally
 
 ```bash
-make start
-```
-
-This will redirect output to `mcp.log`, `agent.log`, `react-ui.log`, and `react-agent.log`.
-
-### Check status
-
-To see if the services are running:
-
-```bash
-make status
-```
-
-### Stop all services
-
-To stop the background processes:
-
-```bash
+make start     # MCP server, A2A server, AG-UI bridge and React UI in the background
+make status    # which services are up, and on which ports
 make stop
 ```
 
-### Manual/Foreground Execution
+Then open http://localhost:3000. Logs go to `mcp.log`, `agent.log`, `react-agent.log` and `react-ui.log`.
 
-If you prefer to run services in separate terminals (foreground):
+To run services in separate terminals instead: `make mcp`, `make agent`, `make react-agent`, `make react-ui`. The legacy UI: `make frontend-build && make frontend`, then http://localhost:8000.
 
-**MCP Server:**
-```bash
-make mcp
-# or: uv run mcp-server/server.py
-```
-
-**A2A Server:**
-```bash
-make agent
-# or: uv run uvicorn currency_agent.agent:a2a_app --host 127.0.0.1 --port 10000
-```
-
-### Frontend Applications
-
-You can run two different frontend applications to interface with the currency agent:
-
-#### 1. FastAPI + Vanilla TypeScript Frontend (with A2UI Demo Sandbox)
-This frontend renders dynamic, glassmorphic UI components directly from the agent's A2UI responses. It also contains two sandbox launcher buttons to demo the rendering pipeline instantly.
-
-- **Install dependencies:**
-  ```bash
-  make frontend-install
-  ```
-- **Build frontend code:**
-  ```bash
-  make frontend-build
-  ```
-- **Start frontend server:**
-  ```bash
-  make frontend
-  ```
-- **Access UI:** Open `http://localhost:8000` in your web browser.
-
-#### 2. React + CopilotKit Frontend
-An alternative, modern React UI featuring CopilotKit integration for agent-supported user interactions.
-
-- **Install dependencies:**
-  ```bash
-  make react-install
-  ```
-- **Start the React UI Dev Server:**
-  ```bash
-  make react-ui
-  ```
-  This opens the web portal on `http://localhost:3000`.
-- **Start the React Agent Service:**
-  ```bash
-  make react-agent
-  ```
-  This launches the FastAPI/Uvicorn backend handler at `http://localhost:8008`.
-
-### A2A Client (CLI Test tool)
-
-Once the servers are running, you can run command-line test queries against the A2A agent:
+**Without uv**, if the dependencies are installed in your active Python:
 
 ```bash
-make test-client
-# or: uv run currency_agent/test_client.py
+python3 mcp-server/server.py
+python3 -m uvicorn currency_agent.agent:a2a_app --host 127.0.0.1 --port 10000
+(cd frontend-react/agent && python3 main.py)
+(cd frontend-react && npm run dev:ui)
 ```
 
-### Testing & Validation
+---
 
-You can run automated tests and validations on the agent integration and frontend applications:
+#### Testing
 
-- **Run all backend tests:**
-  ```bash
-  make test
-  ```
-- **Run Vanilla TS frontend tests:**
-  ```bash
-  make frontend-test
-  ```
-- **Run React UI + Agent E2E integration tests:**
-  ```bash
-  make react-test
-  ```
-- **Validate AG-UI CopilotKit schemas and capabilities:**
-  ```bash
-  make test-agui
-  ```
+| Command | What it checks |
+|---|---|
+| `make test-agui` | AG-UI / CopilotKit endpoints, streaming, A2UI responses and guardrails (needs services running) |
+| `make react-test` | Starts everything, runs the React UI + agent end-to-end test, stops |
+| `make test` | Starts everything, runs pytest (MCP server tests and legacy UI tests), stops |
+| `make frontend-test` | Legacy UI unit tests |
+| `make test-client` | Sends sample questions to the A2A server |
+| `make lint` / `make format` | Ruff check and format |
 
-## 🤝 Contributing
+---
 
-Contributions are welcome! Please feel free to submit pull requests or open issues.
+#### Deploying to Cloud Run
 
-## 📄 License
+```bash
+make deploy    # gcloud builds submit --config cloudbuild.yaml .
+```
 
-This project is licensed under the Apache 2.0 License - see the [LICENSE file](LICENSE) for details.
+`cloudbuild.yaml` builds and deploys two services in `us-central1`: `currency-mcp` (the MCP server) and `currency-agent` (the A2A server on Vertex AI, pointed at the MCP service). `make endpoint`, `make logs` and `make remote-status` inspect the deployed agent. `frontend-react/Dockerfile` packages the React UI and AG-UI bridge as one container.
+
+---
+
+#### Contributing
+
+Issues and pull requests are welcome.
+
+#### License
+
+Apache 2.0. See [LICENSE](LICENSE).
