@@ -42,7 +42,40 @@ const barChartProps = chartProps.extend({
 });
 type BarChartProps = z.infer<typeof barChartProps>;
 
-function BarChartView({ title, labels, values, color = "#10b981", decimals = 4 }: BarChartProps) {
+// Values with both signs (a change in percent, say) are drawn from a zero line:
+// gains go up, losses go down, heights scale with the largest absolute value.
+function SignedBarChartView({ title, labels, values, color = "#10b981", decimals = 4 }: BarChartProps) {
+  const maxAbs = Math.max(...values.map((v) => Math.abs(v))) || 1;
+  const lossColor = "#f87171";
+  return (
+    <div className="bg-slate-900/50 border border-slate-700/50 rounded-xl p-4 mt-2 w-full">
+      {title && <h5 className="m-0 mb-3 text-white text-sm font-semibold">{title}</h5>}
+      <div className="flex justify-around h-[160px] py-2">
+        {labels.map((label, idx) => {
+          const val = values[idx] ?? 0;
+          const pct = (Math.abs(val) / maxAbs) * 100;
+          return (
+            <div key={idx} className="flex flex-col items-center flex-1 h-full" title={`${val}`}>
+              <span className="text-[10px] text-white font-medium h-4">{val >= 0 ? val.toFixed(decimals) : ""}</span>
+              <div className="flex-1 w-full flex items-end justify-center border-b border-slate-500">
+                {val > 0 && <div style={{ height: `${pct}%`, backgroundColor: color }} className="w-5 rounded-t" />}
+              </div>
+              <div className="flex-1 w-full flex items-start justify-center">
+                {val < 0 && <div style={{ height: `${pct}%`, backgroundColor: lossColor }} className="w-5 rounded-b" />}
+              </div>
+              <span className="text-[10px] text-white font-medium h-4">{val < 0 ? val.toFixed(decimals) : ""}</span>
+              <span className="text-[10px] text-slate-300">{label}</span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function BarChartView(props: BarChartProps) {
+  if (props.values.some((v) => v < 0)) return <SignedBarChartView {...props} />;
+  const { title, labels, values, color = "#10b981", decimals = 4 } = props;
   const minVal = Math.min(...values);
   const maxVal = Math.max(...values);
   const range = maxVal - minVal;

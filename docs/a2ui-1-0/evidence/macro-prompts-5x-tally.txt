@@ -1,4 +1,0 @@
-5 of 5: rendered A2UI | How much is 250 USD in EUR?
-5 of 5: rendered A2UI | Show me EUR to USD for the past 6 months and the current rate
-5 of 5: rendered A2UI | Show me the USD to JPY trend over the last 90 days
-5 of 5: rendered A2UI | What's a thousand euros in dollars?
