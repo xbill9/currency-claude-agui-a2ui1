@@ -3,19 +3,19 @@ import traceback
 from typing import Any
 from uuid import uuid4
 
+import httpx
 from a2a.client import A2ACardResolver, A2AClient
 from a2a.types import (
-    SendMessageResponse,
+    GetTaskRequest,
     GetTaskResponse,
+    MessageSendParams,
+    SendMessageRequest,
+    SendMessageResponse,
     SendMessageSuccessResponse,
     Task,
-    TaskState,
-    SendMessageRequest,
-    MessageSendParams,
-    GetTaskRequest,
     TaskQueryParams,
+    TaskState,
 )
-import httpx
 
 AGENT_URL = os.getenv("AGENT_URL", "http://127.0.0.1:10000")
 

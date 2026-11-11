@@ -43,9 +43,13 @@ async def a2a_card_dispatch(
 
     path = request.url.path
     is_agent_card_request = response.status_code == 200 and (
-        path.endswith(AGENT_CARD_WELL_KNOWN_PATH)
-        or path.endswith(PREV_AGENT_CARD_WELL_KNOWN_PATH)
-        or path.endswith(EXTENDED_AGENT_CARD_PATH)
+        path.endswith(
+            (
+                AGENT_CARD_WELL_KNOWN_PATH,
+                PREV_AGENT_CARD_WELL_KNOWN_PATH,
+                EXTENDED_AGENT_CARD_PATH,
+            )
+        )
     )
 
     if not is_agent_card_request:
@@ -84,7 +88,7 @@ async def a2a_card_dispatch(
             media_type="application/json",
             headers=response_headers,
         )
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - serve the original card on any failure
         logger.error(f"Failed to rewrite A2A agent card: {e}")
         return response
 

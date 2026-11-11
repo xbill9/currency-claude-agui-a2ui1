@@ -10,8 +10,10 @@ import json
 import socket
 import sys
 import time
+
 import httpx
 import pytest
+from a2ui_check import check_a2ui_surface, component_texts
 
 # Terminal colors
 GREEN = "\033[92m"
@@ -63,8 +65,12 @@ def test_servers_health():
 
     try:
         r = httpx.get("http://localhost:8008/health", timeout=5.0)
-        assert r.status_code == 200, f"React Agent returned unexpected response: {r.status_code}"
-        assert r.json().get("status") == "ok", f"React Agent returned unexpected status: {r.json()}"
+        assert r.status_code == 200, (
+            f"React Agent returned unexpected response: {r.status_code}"
+        )
+        assert r.json().get("status") == "ok", (
+            f"React Agent returned unexpected status: {r.json()}"
+        )
         print_success("React Agent on port 8008 is healthy.")
     except Exception as e:
         print_failure("Failed to connect to React Agent on port 8008", str(e))
@@ -78,7 +84,9 @@ def test_servers_health():
     try:
         # Next.js API route is compiled faster and is more lightweight to check than full React HTML bundle
         r = httpx.get("http://localhost:3000/api/copilotkit", timeout=15.0)
-        assert r.status_code in [200, 304, 404, 405], f"React UI Server returned unexpected HTTP status {r.status_code}"
+        assert r.status_code in [200, 304, 404, 405], (
+            f"React UI Server returned unexpected HTTP status {r.status_code}"
+        )
         print_success("React UI Server on port 3000 is healthy and reachable.")
     except Exception as e:
         print_failure("Failed to connect to React UI Server on port 3000", str(e))
@@ -117,8 +125,8 @@ def test_copilot_endpoint_flow():
 
         has_started = False
         tool_called = False
-        final_text = ""
         errors = []
+        events = []
 
         client = httpx.Client(timeout=30.0)
         with client.stream("POST", copilot_url, json=payload, headers=headers) as r:
@@ -134,6 +142,7 @@ def test_copilot_endpoint_flow():
 
                 try:
                     event = json.loads(line)
+                    events.append(event)
                     ev_type = event.get("type")
 
                     if ev_type == "RUN_STARTED":
@@ -144,25 +153,33 @@ def test_copilot_endpoint_flow():
                         print_info(
                             f"Event: TOOL_CALL_START -> {event.get('toolCallName')}"
                         )
-                    elif ev_type == "TEXT_MESSAGE_CONTENT":
-                        delta = event.get("delta", "")
-                        final_text += delta
                     elif ev_type == "RUN_ERROR":
                         errors.append(event.get("message"))
                         print_failure(f"Event: RUN_ERROR -> {event.get('message')}")
                 except json.JSONDecodeError:
                     continue
 
-        assert not errors, f"Agent reported stream execution error(s): {', '.join(errors)}"
+        assert not errors, (
+            f"Agent reported stream execution error(s): {', '.join(errors)}"
+        )
         assert has_started, "Stream completed but RUN_STARTED event was missing"
         print_success("SSE Stream completed successfully.")
 
-        assert tool_called, "Stream completed but get_exchange_rate tool was never executed"
+        assert tool_called, (
+            "Stream completed but get_exchange_rate tool was never executed"
+        )
         print_success("The agent successfully invoked a tool during execution.")
 
-        assert final_text, "Agent returned empty response text."
-        print_info(f"Agent response:\n{final_text.strip()}")
-        print_success("Agent streamed content back to UI successfully.")
+        # A2UI 1.0 arrives as the send_a2ui_json_to_client tool result.
+        components = check_a2ui_surface(events)
+        texts = component_texts(components)
+        assert any("USD" in t and "EUR" in t for t in texts), (
+            f"No Text component mentions USD and EUR: {texts}"
+        )
+        print_info(f"A2UI text components: {texts}")
+        print_success(
+            f"Agent streamed an A2UI 1.0 surface with {len(components)} components."
+        )
 
     except Exception as e:
         print_failure("Error occurred during end-to-end streaming test", str(e))

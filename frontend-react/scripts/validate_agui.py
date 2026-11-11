@@ -2,16 +2,19 @@
 """AG-UI / CopilotKit Integration Validation Tool for Currency Agent.
 
 This tool runs automated checks against the CopilotKit (AG-UI) endpoints to
-verify capabilities, stream parsing, A2UI XML/JSON responses, and guardrails.
-Supports testing direct A2A backend (port 10000) or Next.js app (port 3000).
+verify capabilities, stream parsing, A2UI 1.0 tool results, and guardrails.
+Supports testing the AG-UI bridge directly (port 8008) or the Next.js app (port 3000).
 """
 
 import argparse
 import json
 import socket
 import sys
-from typing import Dict, Any, Generator
+from collections.abc import Generator
+from typing import Any
+
 import httpx
+from a2ui_check import check_a2ui_surface, component_texts
 
 # Terminal colors
 GREEN = "\033[92m"
@@ -47,7 +50,7 @@ def is_port_open(port: int) -> bool:
         return s.connect_ex(("127.0.0.1", port)) == 0
 
 
-def parse_sse_stream(response: httpx.Response) -> Generator[Dict[str, Any], None, None]:
+def parse_sse_stream(response: httpx.Response) -> Generator[dict[str, Any]]:
     """Parse SSE (Server-Sent Events) from a response stream."""
     for line in response.iter_lines():
         if not line.strip():
@@ -139,7 +142,7 @@ class AgUiValidator:
             return False
 
     def test_conversion_flow(self) -> bool:
-        """Verify a standard conversion query streams tool and A2UI tags."""
+        """Verify a conversion query calls a tool and returns an A2UI 1.0 surface."""
         print_header("Test Case 3: Streamed Currency Conversion & A2UI Output")
         payload = {
             "runId": f"validation-run-conv-{self.target}",
@@ -161,8 +164,8 @@ class AgUiValidator:
             print_info("Sending conversion request and reading SSE stream...")
             has_started = False
             tool_called = False
-            final_text = ""
             errors = []
+            events = []
 
             with self.client.stream("POST", self.run_url, json=payload) as r:
                 if r.status_code != 200:
@@ -172,6 +175,7 @@ class AgUiValidator:
                     return False
 
                 for event in parse_sse_stream(r):
+                    events.append(event)
                     ev_type = event.get("type")
 
                     if ev_type == "RUN_STARTED":
@@ -181,8 +185,6 @@ class AgUiValidator:
                         print_info(
                             f"Tool execution started: {event.get('toolCallName')}"
                         )
-                    elif ev_type == "TEXT_MESSAGE_CONTENT":
-                        final_text += event.get("delta", "")
                     elif ev_type == "RUN_ERROR":
                         errors.append(event.get("message"))
 
@@ -204,34 +206,21 @@ class AgUiValidator:
 
             print_success("SSE Stream completed with valid flow transitions.")
 
-            # Validate A2UI Payload structure
-            if "<a2ui-json>" not in final_text or "</a2ui-json>" not in final_text:
-                print_failure(
-                    "Missing A2UI XML wrapper tags (<a2ui-json>) in response",
-                    f"Raw response: {final_text}",
-                )
-                return False
-
-            # Extract and validate A2UI JSON payload
+            # A2UI 1.0 arrives as the send_a2ui_json_to_client tool result.
             try:
-                start_tag = "<a2ui-json>"
-                end_tag = "</a2ui-json>"
-                start_idx = final_text.find(start_tag) + len(start_tag)
-                end_idx = final_text.find(end_tag)
-                a2ui_content = final_text[start_idx:end_idx].strip()
-                parsed_json = json.loads(a2ui_content)
-
-                print_success(
-                    "A2UI JSON payload extracted and successfully parsed as valid JSON."
+                components = check_a2ui_surface(events)
+                texts = component_texts(components)
+                assert any("USD" in t and "EUR" in t for t in texts), (
+                    f"No Text component mentions USD and EUR: {texts}"
                 )
-                print(
-                    f"  Extracted Components: {json.dumps(parsed_json.get('updateComponents', {}).get('components', []))[:150]}..."
-                )
-            except Exception as json_err:
-                print_failure(
-                    "Failed to parse extracted A2UI content as JSON", str(json_err)
-                )
+            except AssertionError as a2ui_err:
+                print_failure("A2UI 1.0 output check failed", str(a2ui_err))
                 return False
+
+            print_success(
+                f"A2UI 1.0 createSurface received with {len(components)} components."
+            )
+            print(f"  Text components: {texts}")
 
             return True
         except Exception as e:
@@ -356,7 +345,7 @@ def main():
         "--target",
         choices=["direct", "nextjs"],
         default=None,
-        help="Target server to validate. 'direct' uses python backend (10000), 'nextjs' uses dev server (3000). Autodetect if omitted.",
+        help="Target server to validate. 'direct' uses the AG-UI bridge (8008), 'nextjs' uses dev server (3000). Autodetect if omitted.",
     )
     args = parser.parse_args()
 

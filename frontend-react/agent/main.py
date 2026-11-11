@@ -19,9 +19,10 @@ if not hasattr(socket, "_original_getaddrinfo"):
 
 import os
 import sys
+
+from ag_ui_adk import ADKAgent, add_adk_fastapi_endpoint
 from dotenv import load_dotenv
 from fastapi import FastAPI
-from ag_ui_adk import ADKAgent, add_adk_fastapi_endpoint
 
 load_dotenv()
 
@@ -63,5 +64,5 @@ if __name__ == "__main__":
         print("   Set it with: export GOOGLE_API_KEY='your-key-here'")
         print()
 
-    port = int(os.getenv("PORT", 8008))
+    port = int(os.getenv("PORT", "8008"))
     uvicorn.run(app, host="0.0.0.0", port=port)

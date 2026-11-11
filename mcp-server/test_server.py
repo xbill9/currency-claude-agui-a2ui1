@@ -1,7 +1,7 @@
 import asyncio
 import socket
-import pytest
 
+import pytest
 from fastmcp import Client
 
 

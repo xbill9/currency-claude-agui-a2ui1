@@ -50,7 +50,7 @@ def setup_logging(service_name: str | None = None, level: str | None = None):
         logging.getLogger("httpx").setLevel(logging.WARNING)
 
     service = service_name or os.getenv("SERVICE_NAME", "unknown-service")
-    logging.info(
+    logging.getLogger(__name__).info(
         f"Logging initialized for {service}",
         extra={"service": service, "log_level": level},
     )
@@ -89,5 +89,6 @@ def get_uvicorn_log_config(level: str = "info"):
 if __name__ == "__main__":
     # Test logging
     setup_logging("test-service")
-    logging.info("This is a test log message")
-    logging.error("This is an error message", extra={"error_code": 500})
+    test_logger = logging.getLogger(__name__)
+    test_logger.info("This is a test log message")
+    test_logger.error("This is an error message", extra={"error_code": 500})

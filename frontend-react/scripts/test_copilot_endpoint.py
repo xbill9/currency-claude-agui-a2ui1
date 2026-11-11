@@ -1,12 +1,14 @@
 import json
-import httpx
 import sys
+
+import httpx
 
 COPILOT_ENDPOINT = "http://localhost:3000/api/copilotkit/agent/currency_agent/run"
 
 
 def test_copilot_endpoint():
     import socket
+
     import pytest
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -64,7 +66,7 @@ def test_copilot_endpoint():
                     if "choices" in data:
                         for choice in data["choices"]:
                             delta = choice.get("delta", {})
-                            if "content" in delta and delta["content"]:
+                            if delta.get("content"):
                                 print(delta["content"], end="", flush=True)
                             elif "tool_calls" in delta:
                                 print(

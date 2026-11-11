@@ -15,14 +15,6 @@ if not hasattr(socket, "_original_getaddrinfo"):
 
     socket.getaddrinfo = _ipv4_only_getaddrinfo
 
-from dotenv import load_dotenv
-from google.adk.agents import LlmAgent
-from google.adk.a2a.utils.agent_to_a2a import to_a2a
-from google.adk.tools.mcp_tool import McpToolset, StreamableHTTPConnectionParams
-
-from starlette.responses import JSONResponse
-
-
 # A2UI 1.0 imports
 from a2ui.adk import SendA2uiToClientToolset
 from a2ui.adk.a2a import A2uiPartConverter
@@ -31,11 +23,16 @@ from a2ui.core.schema import AgentToRendererMessage
 from a2ui.processor import A2uiRequestProcessor
 from a2ui.transformers.macros import MacroExpander
 from a2ui.utils import validate_payload
-from pydantic import TypeAdapter
+from dotenv import load_dotenv
 from google.adk.a2a.executor.a2a_agent_executor import (
     A2aAgentExecutor,
     A2aAgentExecutorConfig,
 )
+from google.adk.a2a.utils.agent_to_a2a import to_a2a
+from google.adk.agents import LlmAgent
+from google.adk.tools.mcp_tool import McpToolset, StreamableHTTPConnectionParams
+from pydantic import TypeAdapter
+from starlette.responses import JSONResponse
 
 from currency_agent.macros import CHARTS_CATALOG, MACROS
 
@@ -88,9 +85,7 @@ class MacroSendA2uiToClientToolset(SendA2uiToClientToolset):
             messages = super()._parse_payload(processor, payload)
             typed = [_message_adapter.validate_python(m) for m in messages]
             expanded = macro_expander.transform_to_transport(typed)
-            wire = [
-                m.model_dump(by_alias=True, exclude_none=True) for m in expanded
-            ]
+            wire = [m.model_dump(by_alias=True, exclude_none=True) for m in expanded]
             validate_payload(BASE_CATALOGS, wire)
             return wire
 
@@ -135,8 +130,8 @@ def agent_executor_factory(runner):
     return A2aAgentExecutor(runner=runner, config=config)
 
 
-from google.adk.a2a.utils.agent_card_builder import AgentCardBuilder
 from a2a.types import AgentCapabilities
+from google.adk.a2a.utils.agent_card_builder import AgentCardBuilder
 
 # Monkeypatch AgentCardBuilder to always enable streaming capability
 if not hasattr(AgentCardBuilder, "_original_init"):
@@ -154,7 +149,7 @@ if not hasattr(AgentCardBuilder, "_original_init"):
 a2a_app = to_a2a(
     root_agent,
     host=os.getenv("HOST", "127.0.0.1"),
-    port=int(os.getenv("PORT", 10000)),
+    port=int(os.getenv("PORT", "10000")),
     agent_executor_factory=agent_executor_factory,
 )
 

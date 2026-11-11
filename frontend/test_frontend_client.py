@@ -4,9 +4,10 @@ Frontend API Test Client
 Queries the frontend's FastAPI chat stream endpoint and prints the streaming response.
 """
 
-import sys
-import json
 import argparse
+import json
+import sys
+
 import httpx
 
 DEFAULT_FRONTEND_URL = "http://localhost:8000"

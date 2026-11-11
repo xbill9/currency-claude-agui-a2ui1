@@ -18,21 +18,17 @@ try:
     import opentelemetry.semconv._incubating.attributes.gen_ai_attributes as gen_ai_attr
 
     if not hasattr(gen_ai_attr, "GEN_AI_INPUT_MESSAGES"):
-        setattr(gen_ai_attr, "GEN_AI_INPUT_MESSAGES", "gen_ai.input.messages")
+        gen_ai_attr.GEN_AI_INPUT_MESSAGES = "gen_ai.input.messages"
     if not hasattr(gen_ai_attr, "GEN_AI_OUTPUT_MESSAGES"):
-        setattr(gen_ai_attr, "GEN_AI_OUTPUT_MESSAGES", "gen_ai.output.messages")
+        gen_ai_attr.GEN_AI_OUTPUT_MESSAGES = "gen_ai.output.messages"
     if not hasattr(gen_ai_attr, "GEN_AI_RESPONSE_FINISH_REASONS"):
-        setattr(
-            gen_ai_attr,
-            "GEN_AI_RESPONSE_FINISH_REASONS",
-            "gen_ai.response.finish_reasons",
-        )
+        gen_ai_attr.GEN_AI_RESPONSE_FINISH_REASONS = "gen_ai.response.finish_reasons"
     if not hasattr(gen_ai_attr, "GEN_AI_SYSTEM_INSTRUCTIONS"):
-        setattr(gen_ai_attr, "GEN_AI_SYSTEM_INSTRUCTIONS", "gen_ai.system.instructions")
+        gen_ai_attr.GEN_AI_SYSTEM_INSTRUCTIONS = "gen_ai.system.instructions"
     if not hasattr(gen_ai_attr, "GEN_AI_USAGE_INPUT_TOKENS"):
-        setattr(gen_ai_attr, "GEN_AI_USAGE_INPUT_TOKENS", "gen_ai.usage.input_tokens")
+        gen_ai_attr.GEN_AI_USAGE_INPUT_TOKENS = "gen_ai.usage.input_tokens"
     if not hasattr(gen_ai_attr, "GEN_AI_USAGE_OUTPUT_TOKENS"):
-        setattr(gen_ai_attr, "GEN_AI_USAGE_OUTPUT_TOKENS", "gen_ai.usage.output_tokens")
+        gen_ai_attr.GEN_AI_USAGE_OUTPUT_TOKENS = "gen_ai.usage.output_tokens"
 except ImportError:
     pass
 
@@ -42,7 +38,7 @@ try:
     import mcp.types
 
     if not hasattr(mcp, "SamplingCapability"):
-        setattr(mcp, "SamplingCapability", mcp.types.SamplingCapability)
+        mcp.SamplingCapability = mcp.types.SamplingCapability
 except ImportError:
     pass
 
@@ -62,7 +58,7 @@ try:
             return mcp.ClientSession._original_init(self, *args, **kwargs)
 
         mcp.ClientSession.__init__ = _patched_client_session_init
-except Exception:
+except Exception:  # noqa: BLE001, S110 - best-effort shim; must never block startup
     pass
 
 # Monkeypatch to fix TypeError: ClientSession.call_tool() got an unexpected keyword argument 'meta'
@@ -81,7 +77,7 @@ try:
             return mcp.ClientSession._original_call_tool(self, *args, **kwargs)
 
         mcp.ClientSession.call_tool = _patched_client_session_call_tool
-except Exception:
+except Exception:  # noqa: BLE001, S110 - best-effort shim; must never block startup
     pass
 
 # Monkeypatch to prevent ADK from treating A2UI template expressions (e.g., {expression}) as state variables
@@ -89,7 +85,7 @@ try:
     import google.adk.utils.instructions_utils as inst_utils
 
     inst_utils._is_valid_state_name = lambda var_name: False
-except Exception:
+except Exception:  # noqa: BLE001, S110 - best-effort shim; must never block startup
     pass
 
 from . import agent as agent

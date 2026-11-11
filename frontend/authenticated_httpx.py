@@ -21,21 +21,17 @@ try:
     import opentelemetry.semconv._incubating.attributes.gen_ai_attributes as gen_ai_attr
 
     if not hasattr(gen_ai_attr, "GEN_AI_INPUT_MESSAGES"):
-        setattr(gen_ai_attr, "GEN_AI_INPUT_MESSAGES", "gen_ai.input.messages")
+        gen_ai_attr.GEN_AI_INPUT_MESSAGES = "gen_ai.input.messages"
     if not hasattr(gen_ai_attr, "GEN_AI_OUTPUT_MESSAGES"):
-        setattr(gen_ai_attr, "GEN_AI_OUTPUT_MESSAGES", "gen_ai.output.messages")
+        gen_ai_attr.GEN_AI_OUTPUT_MESSAGES = "gen_ai.output.messages"
     if not hasattr(gen_ai_attr, "GEN_AI_RESPONSE_FINISH_REASONS"):
-        setattr(
-            gen_ai_attr,
-            "GEN_AI_RESPONSE_FINISH_REASONS",
-            "gen_ai.response.finish_reasons",
-        )
+        gen_ai_attr.GEN_AI_RESPONSE_FINISH_REASONS = "gen_ai.response.finish_reasons"
     if not hasattr(gen_ai_attr, "GEN_AI_SYSTEM_INSTRUCTIONS"):
-        setattr(gen_ai_attr, "GEN_AI_SYSTEM_INSTRUCTIONS", "gen_ai.system.instructions")
+        gen_ai_attr.GEN_AI_SYSTEM_INSTRUCTIONS = "gen_ai.system.instructions"
     if not hasattr(gen_ai_attr, "GEN_AI_USAGE_INPUT_TOKENS"):
-        setattr(gen_ai_attr, "GEN_AI_USAGE_INPUT_TOKENS", "gen_ai.usage.input_tokens")
+        gen_ai_attr.GEN_AI_USAGE_INPUT_TOKENS = "gen_ai.usage.input_tokens"
     if not hasattr(gen_ai_attr, "GEN_AI_USAGE_OUTPUT_TOKENS"):
-        setattr(gen_ai_attr, "GEN_AI_USAGE_OUTPUT_TOKENS", "gen_ai.usage.output_tokens")
+        gen_ai_attr.GEN_AI_USAGE_OUTPUT_TOKENS = "gen_ai.usage.output_tokens"
 except ImportError:
     pass
 
@@ -45,7 +41,7 @@ try:
     import mcp.types
 
     if not hasattr(mcp, "SamplingCapability"):
-        setattr(mcp, "SamplingCapability", mcp.types.SamplingCapability)
+        mcp.SamplingCapability = mcp.types.SamplingCapability
 except ImportError:
     pass
 
@@ -84,7 +80,7 @@ class _IdentityTokenAuth(httpx.Auth):
                 credentials.refresh(Request())
                 self.session = AuthorizedSession(credentials)
                 id_token = self.session.credentials.token
-            except (DefaultCredentialsError, Exception) as e:
+            except (DefaultCredentialsError, Exception) as e:  # noqa: BLE001 - fall back to gcloud locally
                 logger.debug(f"Cloud credentials not found, falling back to local: {e}")
 
             if not id_token:

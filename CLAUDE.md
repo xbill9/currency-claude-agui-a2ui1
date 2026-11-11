@@ -19,7 +19,7 @@ The Makefile, `frontend-react/scripts/run-agent.sh`, `setup-agent.sh` and npm `p
 | Tests | `python3 -m pytest mcp-server/test_server.py` (needs :8080 up); `PYTHONPATH=frontend python3 -m pytest frontend/tests` |
 | AG-UI end-to-end | `python3 frontend-react/scripts/validate_agui.py [--target nextjs\|direct]`; `python3 frontend-react/scripts/test_react_e2e.py` (needs :3000 + :8008) |
 
-The lint baseline already fails (77 `ruff check` errors and 2 unformatted files on 2026-11-11), so judge lint on the lines you changed. A PostToolUse hook in `.claude/settings.json` runs `ruff format` + `ruff check --fix` on every `.py` file Claude edits, which can also fix pre-existing issues elsewhere in that file. Check `git diff` before committing.
+Lint is clean with the system ruff (0.16.7, which turns on many more rules than the 0.15.11 in `uv.lock`), so keep it at zero. Fix new findings in the code. A blind `except` is allowed only with a `# noqa: BLE001 - <reason>` explaining why it must catch everything; test scripts are exempt through `per-file-ignores` in `pyproject.toml`. A PostToolUse hook in `.claude/settings.json` runs `ruff format` + `ruff check --fix` on every `.py` file Claude edits, which can also fix pre-existing issues elsewhere in that file. Check `git diff` before committing.
 
 `make stop` and `make status` are safe (no uv). Run services in the background with logs to `mcp.log`, `agent.log`, `react-agent.log`, `react-ui.log` (gitignored) to match the Makefile. If `uv.lock` or `.venv/` shows up in `git status`, revert/remove it. Use `/verify-stack` to check a change end to end.
 

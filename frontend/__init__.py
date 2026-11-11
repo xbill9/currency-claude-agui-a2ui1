@@ -24,7 +24,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 try:
     _, project_id = google.auth.default()
     os.environ.setdefault("GOOGLE_CLOUD_PROJECT", project_id)  # type: ignore
-except Exception:
+except Exception:  # noqa: BLE001, S110 - no credentials is a valid local setup
     # If no credentials available, continue without setting project
     pass
 

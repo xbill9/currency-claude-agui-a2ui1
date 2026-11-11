@@ -102,7 +102,7 @@ def RateHistoryChart(currency_from: str, currency_to: str, days: int = 30) -> Ca
     """
     src, dst = _code(currency_from), _code(currency_to)
     days = max(7, min(int(days), 365))
-    start = (dt.date.today() - dt.timedelta(days=days)).isoformat()
+    start = (dt.datetime.now(dt.UTC).date() - dt.timedelta(days=days)).isoformat()
     data = _get(f"{start}..", **{"from": src, "to": dst})
     series = sorted(data["rates"].items())
     labels = [day[5:] for day, _ in series]  # MM-DD

@@ -18,21 +18,17 @@ try:
     import opentelemetry.semconv._incubating.attributes.gen_ai_attributes as gen_ai_attr
 
     if not hasattr(gen_ai_attr, "GEN_AI_INPUT_MESSAGES"):
-        setattr(gen_ai_attr, "GEN_AI_INPUT_MESSAGES", "gen_ai.input.messages")
+        gen_ai_attr.GEN_AI_INPUT_MESSAGES = "gen_ai.input.messages"
     if not hasattr(gen_ai_attr, "GEN_AI_OUTPUT_MESSAGES"):
-        setattr(gen_ai_attr, "GEN_AI_OUTPUT_MESSAGES", "gen_ai.output.messages")
+        gen_ai_attr.GEN_AI_OUTPUT_MESSAGES = "gen_ai.output.messages"
     if not hasattr(gen_ai_attr, "GEN_AI_RESPONSE_FINISH_REASONS"):
-        setattr(
-            gen_ai_attr,
-            "GEN_AI_RESPONSE_FINISH_REASONS",
-            "gen_ai.response.finish_reasons",
-        )
+        gen_ai_attr.GEN_AI_RESPONSE_FINISH_REASONS = "gen_ai.response.finish_reasons"
     if not hasattr(gen_ai_attr, "GEN_AI_SYSTEM_INSTRUCTIONS"):
-        setattr(gen_ai_attr, "GEN_AI_SYSTEM_INSTRUCTIONS", "gen_ai.system.instructions")
+        gen_ai_attr.GEN_AI_SYSTEM_INSTRUCTIONS = "gen_ai.system.instructions"
     if not hasattr(gen_ai_attr, "GEN_AI_USAGE_INPUT_TOKENS"):
-        setattr(gen_ai_attr, "GEN_AI_USAGE_INPUT_TOKENS", "gen_ai.usage.input_tokens")
+        gen_ai_attr.GEN_AI_USAGE_INPUT_TOKENS = "gen_ai.usage.input_tokens"
     if not hasattr(gen_ai_attr, "GEN_AI_USAGE_OUTPUT_TOKENS"):
-        setattr(gen_ai_attr, "GEN_AI_USAGE_OUTPUT_TOKENS", "gen_ai.usage.output_tokens")
+        gen_ai_attr.GEN_AI_USAGE_OUTPUT_TOKENS = "gen_ai.usage.output_tokens"
 except ImportError:
     pass
 
@@ -42,7 +38,7 @@ try:
     import mcp.types
 
     if not hasattr(mcp, "SamplingCapability"):
-        setattr(mcp, "SamplingCapability", mcp.types.SamplingCapability)
+        mcp.SamplingCapability = mcp.types.SamplingCapability
 except ImportError:
     pass
 
@@ -57,6 +53,15 @@ from collections.abc import AsyncGenerator
 from typing import Any
 
 import httpx
+from a2a.client import A2ACardResolver, A2AClient
+from a2a.types import (
+    Message as A2AMessage,
+    MessageSendParams,
+    Part as A2APart,
+    Role as A2ARole,
+    SendStreamingMessageRequest,
+    TextPart as A2ATextPart,
+)
 from a2a_utils import a2a_card_dispatch
 from authenticated_httpx import create_authenticated_client
 from fastapi import FastAPI
@@ -70,16 +75,6 @@ from opentelemetry.exporter.cloud_trace import CloudTraceSpanExporter
 from opentelemetry.sdk.trace import TracerProvider, export
 from pydantic import BaseModel
 from starlette.middleware.base import BaseHTTPMiddleware
-
-from a2a.client import A2ACardResolver, A2AClient
-from a2a.types import (
-    MessageSendParams,
-    SendStreamingMessageRequest,
-    Message as A2AMessage,
-    Part as A2APart,
-    TextPart as A2ATextPart,
-    Role as A2ARole,
-)
 
 
 class Feedback(BaseModel):
@@ -102,7 +97,7 @@ if os.getenv("K_SERVICE") or os.getenv("ENABLE_TRACING"):
         provider.add_span_processor(processor)
         trace.set_tracer_provider(provider)
         logger.info("OpenTelemetry CloudTraceSpanExporter initialized.")
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - tracing is optional
         logger.warning(f"Could not initialize CloudTraceSpanExporter: {e}")
 else:
     logger.info("OpenTelemetry Cloud Trace is disabled for local development.")
@@ -128,14 +123,12 @@ a2a_clients: dict[str, A2AClient] = {}
 
 
 async def get_client(agent_server_origin: str) -> httpx.AsyncClient:
-    global clients
     if agent_server_origin not in clients:
         clients[agent_server_origin] = create_authenticated_client(agent_server_origin)
     return clients[agent_server_origin]
 
 
 async def get_a2a_client(agent_server_origin: str) -> A2AClient:
-    global a2a_clients
     if agent_server_origin not in a2a_clients:
         httpx_client = await get_client(agent_server_origin)
         resolver = A2ACardResolver(
@@ -233,9 +226,9 @@ async def query_adk_server(
                 try:
                     event = server_event.json()
                     yield event
-                except Exception as e:
+                except Exception as e:  # noqa: BLE001 - skip one bad event, keep streaming
                     logger.error(f"Failed to parse SSE event: {e}")
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - report any failure to the UI as a message
         logger.error(f"SSE connection failed: {e}")
         yield {
             "author": agent_name,
@@ -611,7 +604,7 @@ else:
 if __name__ == "__main__":
     import uvicorn
 
-    port = int(os.getenv("PORT", 8080))
+    port = int(os.getenv("PORT", "8080"))
     print(f"Starting server on port {port}")
     uvicorn.run(
         "main:app",

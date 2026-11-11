@@ -1,5 +1,5 @@
 import os
-from unittest.mock import AsyncMock, patch, MagicMock
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from fastapi.testclient import TestClient
@@ -49,15 +49,15 @@ def test_chat_stream_success(mock_get_a2a_client, client):
     # Mock the send_message_streaming generator
     async def mock_streaming_responses(*args, **kwargs):
         from a2a.types import (
-            SendStreamingMessageResponse,
-            SendStreamingMessageSuccessResponse,
             Message,
             Part,
-            TextPart,
             Role,
-            TaskStatusUpdateEvent,
-            TaskStatus,
+            SendStreamingMessageResponse,
+            SendStreamingMessageSuccessResponse,
             TaskState,
+            TaskStatus,
+            TaskStatusUpdateEvent,
+            TextPart,
         )
 
         status_event = TaskStatusUpdateEvent(
