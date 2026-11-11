@@ -51,14 +51,17 @@ function BarChartView({ title, labels, values, color = "#10b981" }: ChartProps) 
           const val = values[idx] ?? 0;
           const heightPercent = range > 0 ? ((val - baseline) / denom) * 100 : 100;
           return (
-            <div key={idx} className="flex flex-col items-center flex-1 gap-2">
+            <div key={idx} className="flex flex-col items-center flex-1 h-full gap-2">
               <span className="text-[10px] text-white font-medium">{val.toFixed(4)}</span>
-              <div
-                style={{ height: `${heightPercent}%`, backgroundColor: color }}
-                className="w-5 rounded-t transition-all duration-500 ease-out"
-                title={`${val}`}
-              />
-              <span className="text-[10px] text-slate-400">{label}</span>
+              {/* The bar's % height needs a parent with a definite height. */}
+              <div className="flex-1 w-full flex items-end justify-center">
+                <div
+                  style={{ height: `${heightPercent}%`, backgroundColor: color }}
+                  className="w-5 rounded-t transition-all duration-500 ease-out"
+                  title={`${val}`}
+                />
+              </div>
+              <span className="text-[10px] text-slate-300">{label}</span>
             </div>
           );
         })}

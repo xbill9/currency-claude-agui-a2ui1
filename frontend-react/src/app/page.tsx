@@ -7,7 +7,7 @@ import {
   CopilotSidebar,
 } from "@copilotkit/react-core/v2";
 import dynamic from "next/dynamic";
-import { extractA2uiMessages } from "@/components/a2uiResult";
+import { extractA2uiMessages, extractRatePayload } from "@/components/a2uiResult";
 
 // @a2ui/react touches browser globals at import time, so load it client-only.
 const A2uiMessages = dynamic(
@@ -98,8 +98,9 @@ function YourMainContent({
       render: ({ parameters, result }: any) => {
         const from = (parameters as any)?.currency_from || "USD";
         const to = (parameters as any)?.currency_to || "EUR";
-        const rate = (result as any)?.rates?.[to] || (result as any)?.rates?.[to.toUpperCase()];
-        const date = (result as any)?.date;
+        const payload = extractRatePayload(result);
+        const rate = payload?.rates?.[to] ?? payload?.rates?.[to.toUpperCase()];
+        const date = payload?.date;
 
         return (
           <ExchangeRateCard
