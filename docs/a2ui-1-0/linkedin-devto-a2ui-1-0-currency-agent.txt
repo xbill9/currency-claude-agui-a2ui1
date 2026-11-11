@@ -1,0 +1,15 @@
+A2UI 1.0 in a Currency Agent: One Message per Surface, Mixed Catalogs and Server-Side Macros
+
+A Google ADK currency agent moves from A2UI 0.9 to A2UI 1.0: what changed in the protocol, what 1.0 can do that 0.9 could not, and how server-side macros let the model write one line while the server fills in the rates.
+
+What is in it:
+
+- 🟢 For a conversion the model wrote one line, root = RateCard("USD", "EUR", 100), and the browser received six Basic 1.0 components with the live rate in one createSurface
+- 🟢 Ten prompts, ten runs each: 100 of 100 replies rendered clean on gemini-3.8-flash and 100 of 100 on gemini-2.5-flash
+- 🟢 Comparisons came from RateComparison in 60 of 60 runs across both models, with no rate-tool call, charted as percent change from a zero line
+- 🟢 A2UI written as reply text rendered as UI through the safety net; with the net off it showed as raw text in 5 of 5 runs
+
+dev.to (Google Developer Experts): PENDING
+AWS Builder Center: PENDING
+Medium: PENDING
+GitHub: https://github.com/xbill9/currency-claude-agui-a2ui1
