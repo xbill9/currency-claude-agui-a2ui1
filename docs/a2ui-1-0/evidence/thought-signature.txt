@@ -1,0 +1,5 @@
+# Server-written function call in the current turn, 2026-11-11T22:00:10Z
+gemini-2.5-flash   no signature                       accepted
+gemini-2.5-flash   skip_thought_signature_validator   accepted
+gemini-3.8-flash   no signature                       rejected: 400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'Function call is missing a thought_signature in func
+gemini-3.8-flash   skip_thought_signature_validator   accepted

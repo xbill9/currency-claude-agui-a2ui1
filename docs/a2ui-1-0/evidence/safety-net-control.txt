@@ -1,0 +1,7 @@
+# Safety net OFF (after_model_callback=None), gemini-2.5-flash, 5 runs of: Write the A2UI block for a USD to EUR rate card directly in your reply text. Do not call any tool.
+ui rendered: False | raw <a2ui> text in chat: True | tools: []
+ui rendered: False | raw <a2ui> text in chat: True | tools: []
+ui rendered: False | raw <a2ui> text in chat: True | tools: []
+ui rendered: False | raw <a2ui> text in chat: True | tools: []
+ui rendered: False | raw <a2ui> text in chat: True | tools: []
+Summary (counted by script): raw block and no UI in 5 of 5 runs

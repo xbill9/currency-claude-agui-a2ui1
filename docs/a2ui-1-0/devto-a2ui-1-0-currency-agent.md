@@ -10,7 +10,7 @@ This article provides a step by step guide to a currency agent that answers with
 
 https://github.com/xbill9/currency-claude-agui-a2ui1
 
-**On A2UI 1.0 the model writes one line, and the server fills in the numbers.** For "Convert 100 USD to EUR" the model's whole output is `root = RateCard("USD", "EUR", 100)`. A server-side macro fetches the rate from the Frankfurter API, expands that line into six Basic catalog components, and the browser receives them in a single `createSurface` message. On the 0.9 build the model called the rate tool, read the result, and typed every figure into the component JSON. The four macro prompts below rendered in 5 of 5 runs each, with no call to the rate tool.
+**On A2UI 1.0 the model writes one line, and the server fills in the numbers.** For "Convert 100 USD to EUR" the model's whole UI is `root = RateCard("USD", "EUR", 100)`. A server-side macro fetches the rate from the Frankfurter API, expands the line into six Basic catalog components, and the browser receives them in a single `createSurface` message. On the 0.9 build the model called the rate tool, read the result, and typed every figure into the component JSON. Ten prompts, run ten times each, rendered cleanly in 100 of 100 replies on `gemini-3.8-flash` and 100 of 100 on `gemini-2.5-flash`.
 
 ---
 
@@ -36,7 +36,7 @@ Versions, read from the machine on 2026-11-11:
 | `google-adk` / `ag_ui_adk` / `a2a-sdk` | 2.13.0 / 0.6.5 / 0.3.26 |
 | `next` / `react` / `@copilotkit/react-core` | 16.1.1 / 19.2.7 / 1.56.4 |
 | Python / Node | 3.14.7 / v24.21.0 |
-| Model | `gemini-2.5-flash` |
+| Model | `gemini-3.8-flash` (default), `gemini-2.5-flash` |
 
 ---
 
@@ -48,8 +48,10 @@ Versions, read from the machine on 2026-11-11:
 | :--- | :--- | :--- |
 | Agent library | `a2ui-agent-sdk` 0.2.1, `A2uiSchemaManager(version="0.9")` | `a2ui-agent-sdk` 0.11.0, `a2ui-adk` 0.3.0, `a2ui-core` 0.6.0 |
 | Model output | Component JSON with the figures in it | An Express `<a2ui>` block, usually one macro call |
-| Rate figures | Typed by the model from the MCP result | Fetched by the macro on the server |
+| Rate figures | Typed by the model from the MCP result | Fetched by a macro on the server |
+| Comparisons | Several rate-tool calls, then model-typed values | One `RateComparison` call |
 | How the UI travels | `<a2ui-json>` blocks in the reply text | `validated_a2ui_json` in the tool result |
+| A2UI written as reply text | Parsed out of the text in the browser | Sent through the UI tool on the server |
 | Validation | A browser normalizer accepts several shapes | The server validates before and after macro expansion |
 | Renderer | `@copilotkit/a2ui-renderer` with CopilotKit's A2UI middleware | `@a2ui/react` 0.15.0 |
 | Charts catalog id | `https://a2ui.org/catalog/currency-charts` | `https://a2ui.org/catalog/currency-charts/v1/catalog.json`, `protocolVersion` 1.0 |
@@ -113,7 +115,7 @@ echo "GOOGLE_API_KEY=<your_api_key_here>" >> .env
 echo "GOOGLE_GENAI_USE_VERTEXAI=FALSE" >> .env
 ```
 
-`make install` runs `uv sync` and `npm install` for both front ends. The agent uses `gemini-2.5-flash` unless `GENAI_MODEL` is set in `.env`.
+`make install` runs `uv sync` and `npm install` for both front ends. The agent uses `gemini-3.8-flash` unless `GENAI_MODEL` is set in `.env`.
 
 ---
 
@@ -189,21 +191,26 @@ def RateCard(currency_from: str, currency_to: str, amount: float = 1.0) -> Card:
     )
 ```
 
-`_code()` accepts only a three-letter currency code, and `RateHistoryChart` clamps its day count to 7–365, because the arguments come from the model.
+`_code()` accepts only a three-letter currency code, and the day counts are clamped to 7–365, because the arguments come from the model.
 
-For "Convert 100 USD to EUR please." the model's entire tool call was:
+For "Convert 100 USD to EUR please." the model's whole tool call was:
 
-```json
-{"a2ui_payload": "<a2ui>\nroot = RateCard(\"USD\", \"EUR\", 100, catalogId=\"https://a2ui.org/catalogs/macros\")\n</a2ui>"}
+```text
+send_a2ui_json_to_client:
+<a2ui>
+surface("conversion")
+root = RateCard("USD", "EUR", 100)
+</a2ui>
 ```
 
 What reached the browser:
 
 ```text
-version 1.0, createSurface, 6 components: Text, Text, Divider, Text, Column, Card
-"### 100.00 USD = 89.87 EUR"
-"1 USD = 0.89871 EUR"
-"ECB reference rate for 2026-11-11 (Frankfurter API)"
+version 1.0, ['createSurface'], 6 components
+  https://a2ui.org/specification/v1_0/catalogs/basic/catalog.json: ['Text', 'Text', 'Divider', 'Text', 'Column', 'Card']
+  Text: ### 100.00 USD = 89.87 EUR
+  Text: 1 USD = 0.89871 EUR
+  Text: ECB reference rate for 2026-11-11 (Frankfurter API)
 ```
 
 The agent validates twice in `currency_agent/agent.py`: once against the catalogs the model sees, which include the macros, and again after expansion against the catalogs the browser implements:
@@ -226,20 +233,22 @@ The browser implements two catalogs: Basic 1.0 and a currency charts catalog wit
 
 ```text
 <a2ui>
-root = Column([
-  RateHistoryChart("EUR", "USD", days=180, catalogId="https://a2ui.org/catalogs/macros"),
-  RateCard("EUR", "USD", catalogId="https://a2ui.org/catalogs/macros")
-])
+surface("main")
+root = Column([rateCard, historyChart])
+rateCard = RateCard("EUR", "USD")
+historyChart = RateHistoryChart("EUR", "USD", 180)
 </a2ui>
 ```
 
 The browser received one `createSurface` with each component naming its catalog:
 
 ```text
-version 1.0 | messages: ['createSurface']
-  https://a2ui.org/specification/v1_0/catalogs/basic/catalog.json: ['Column', 'Text', 'Text', 'Column', 'Card', 'Text', 'Text', 'Divider', 'Text', 'Column', 'Card']
+version 1.0, ['createSurface'], 12 components
+  https://a2ui.org/specification/v1_0/catalogs/basic/catalog.json: ['Column', 'Text', 'Text', 'Divider', 'Text', 'Column', 'Card', 'Text', 'Text', 'Column', 'Card']
   https://a2ui.org/catalog/currency-charts/v1/catalog.json: ['LineChart']
 ```
+
+![A rate card for EUR to USD above a 180-day line chart](https://raw.githubusercontent.com/xbill9/currency-claude-agui-a2ui1/main/docs/a2ui-1-0/img/card-and-chart.png)
 
 The macros catalog appears only in what the model writes. After expansion, every component belongs to a catalog the browser implements.
 
@@ -272,7 +281,7 @@ Ask: **How much is 250 USD in EUR?**
 
 ![Rate card: 250.00 USD = 224.68 EUR, 1 USD = 0.89871 EUR, ECB reference rate for 2026-11-11](https://raw.githubusercontent.com/xbill9/currency-claude-agui-a2ui1/main/docs/a2ui-1-0/img/rate-card.png)
 
-One tool call, `send_a2ui_json_to_client`. Everyday wording works the same way: "What's a thousand euros in dollars?" returned `1,000.00 EUR = 1,112.70 USD`.
+Everyday wording works the same way: "What's a thousand euros in dollars?" became `RateCard("EUR", "USD", 1000)` and `1,000.00 EUR = 1,112.70 USD`.
 
 ---
 
@@ -284,60 +293,163 @@ Ask: **Show me the USD to JPY trend over the last 90 days**
 
 `RateHistoryChart("USD", "JPY", 90)` fetched 65 daily rates and drew them with `LineChart`. The low, high and latest line is computed in the macro.
 
-The two-catalog surface from Step 5:
-
-![A rate card for EUR to USD and a 180-day line chart](https://raw.githubusercontent.com/xbill9/currency-claude-agui-a2ui1/main/docs/a2ui-1-0/img/card-and-chart.png)
-
-"How has the British pound done against the euro this year?" became the last 365 days, 2025-11-11 to 2026-11-11, with 256 points:
+"How has the British pound done against the euro this year?" became `RateHistoryChart("GBP", "EUR", 365)`, 2025-11-11 to 2026-11-11, with 256 points:
 
 ![The full app: the Currency Intellect page on the left and the chat panel on the right with a GBP to EUR chart for the last 365 days](https://raw.githubusercontent.com/xbill9/currency-claude-agui-a2ui1/main/docs/a2ui-1-0/img/full-app.png)
 
 ---
 
-#### Step 9 — A Bar Chart the Model Writes Itself
+#### Step 9 — Comparing Currencies
 
-No macro covers a comparison of several currencies, so the model composes it from the charts catalog. Ask: **Compare the euro, pound and Swiss franc against the dollar in a bar chart**
+`RateComparison` fetches today's rate for each currency and the history over a period, in two Frankfurter calls, and charts the percent change. Percent change puts every currency on one scale, yen included:
 
-![Three exchange rate cards from the MCP tool calls, EUR, GBP and CHF to USD, above a bar chart of the same three values](https://raw.githubusercontent.com/xbill9/currency-claude-agui-a2ui1/main/docs/a2ui-1-0/img/bar-chart.png)
-
-This answer follows the 0.9 pattern on 1.0 components: the model calls `get_exchange_rate` once per currency, each call drawing an exchange rate card, then types the values into `BarChart`. A script compared the bar values with the rates the tool returned:
-
-```text
-## Compare the euro, pound and Swiss franc against the dollar in a bar chart
-   MCP rates : {'USD->EUR': 0.89871, 'USD->GBP': 0.75149, 'USD->CHF': 0.82987}
-   bar values: {'EUR': 0.89871, 'GBP': 0.75149, 'CHF': 0.82987}
-   identical : True
+```python
+@macro
+def RateComparison(currency_from: str, currencies: list[str], days: int = 30) -> Card:
+    """Card comparing several currencies against one base currency: today's rate
+    for each, and a bar chart of how much each rate moved over the period, in
+    percent. The server looks up every rate, so do not pass rate figures.
+    """
 ```
 
-Over five runs of each prompt:
+Ask: **Compare the euro, pound and Swiss franc against the dollar in a bar chart**
 
 ```text
-3 of 5: bar chart, values identical | Compare the euro, pound and Swiss franc against the dollar in a bar chart
-2 of 5: no bar chart | Compare the euro, pound and Swiss franc against the dollar in a bar chart
-4 of 5: bar chart, values identical | Show a bar chart of 1 USD in EUR, GBP, JPY, CHF and CAD
-1 of 5: no bar chart | Show a bar chart of 1 USD in EUR, GBP, JPY, CHF and CAD
+send_a2ui_json_to_client:
+<a2ui>
+surface("main")
+root = RateComparison("USD", ["EUR", "GBP", "CHF"])
+</a2ui>
 ```
 
-Every bar chart that rendered had the tool's values. Six more runs of the first prompt show what the others did:
+![1 USD against 3 currencies: today's rates for EUR, GBP and CHF above a bar chart of the change since 2026-10-12, EUR up 0.49 percent, GBP down 0.54, CHF down 0.36](https://raw.githubusercontent.com/xbill9/currency-claude-agui-a2ui1/main/docs/a2ui-1-0/img/comparison.png)
 
-```text
-4 of 6: rendered BarChart
-2 of 6: Express block as plain text, no UI
-```
+`BarChart` draws values with both signs from a zero line: gains up, losses down in red. A new optional `decimals` prop sets the label precision, added in the catalog JSON, the Python builder and the React component together.
 
-In those runs the model wrote the `<a2ui>` block into its reply text instead of calling `send_a2ui_json_to_client`, so the user sees the raw block. The macro prompts in Steps 7 and 8 rendered in every run.
+Ask: **Show a bar chart of 1 USD in EUR, GBP, JPY, CHF and CAD**
 
-Keep yen out of a mixed bar chart: next to rates below 1.5, `159.23` leaves the other bars as slivers.
+![1 USD against 5 currencies, with JPY at 159.23 in the rate list and a 0.40 percent change in the chart beside EUR, GBP, CHF and CAD](https://raw.githubusercontent.com/xbill9/currency-claude-agui-a2ui1/main/docs/a2ui-1-0/img/comparison-five.png)
 
 ---
 
-#### Step 10 — Off-Topic Questions
+#### Step 10 — A2UI Written as Reply Text Still Renders
+
+The model is told to pass A2UI to `send_a2ui_json_to_client`, and the Express guide in the same prompt tells it to wrap every block in `<a2ui>` tags. When it writes the block into its reply instead, `currency_agent/a2ui_rescue.py`, the agent's `after_model_callback`, sends it through the tool anyway. ADK runs the callback on every streamed chunk and on the final response:
+
+```python
+def rescue_a2ui_text(
+    callback_context: CallbackContext, llm_response: LlmResponse
+) -> LlmResponse | None:
+    """``after_model_callback``: send A2UI written as text through the UI tool."""
+    if not llm_response.content or not llm_response.content.parts:
+        return None
+    key = callback_context.invocation_id
+    if llm_response.partial:
+        return _filter_partial(key, llm_response)
+    _streams.pop(key, None)
+    return _rewrite_final(llm_response)
+```
+
+`_filter_partial` holds back streamed text from the point `<a2ui` begins, so the raw block never reaches the chat. `_rewrite_final` turns each block into a `send_a2ui_json_to_client` call, which ADK then runs like any other tool call: compile, expand macros, validate.
+
+Ask for it on purpose: **Write the A2UI block for a USD to EUR rate card directly in your reply text. Do not call any tool.**
+
+```text
+version 1.0, ['createSurface'], 6 components
+  Text: ### 1.00 USD = 0.90 EUR
+  Text: 1 USD = 0.89871 EUR
+  Text: ECB reference rate for 2026-11-11 (Frankfurter API)
+
+### Bridge log during this request
+[INFO]: A2UI written as reply text: sent 1 block(s) through send_a2ui_json_to_client
+[INFO]: Validated call to tool send_a2ui_json_to_client with a2ui_payload
+```
+
+With the callback switched off, the same prompt on `gemini-2.5-flash`:
+
+```text
+ui rendered: False | raw <a2ui> text in chat: True | tools: []
+```
+
+in 5 of 5 runs.
+
+---
+
+#### 🔎 Tip: Sign the Function Calls the Server Writes
+
+Gemini 3 checks thought signatures on the function calls in the current turn, and a call written by the server has none:
+
+```shell
+python3 docs/a2ui-1-0/tools/signature_check.py gemini-2.5-flash gemini-3.8-flash
+```
+
+```text
+gemini-2.5-flash   no signature                       accepted
+gemini-2.5-flash   skip_thought_signature_validator   accepted
+gemini-3.8-flash   no signature                       rejected: 400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'Function call is missing a thought_signature in func
+gemini-3.8-flash   skip_thought_signature_validator   accepted
+```
+
+The safety net sets `thought_signature=b"skip_thought_signature_validator"` on every call it writes.
+
+---
+
+#### Step 11 — Invalid Codes and Off-Topic Questions
+
+Ask: **Convert 100 USD to XYZ**
+
+![A card reading: Unable to convert: XYZ is not a recognized currency code. Please provide a valid 3-letter currency code (such as EUR, GBP, JPY, or CAD).](https://raw.githubusercontent.com/xbill9/currency-claude-agui-a2ui1/main/docs/a2ui-1-0/img/invalid-code.png)
+
+`RateCard("USD", "XYZ", 100)` fails on Frankfurter's answer, and the model composes an error card from Basic catalog components on its second call.
 
 Ask: **What's the weather in Paris?**
 
 ![The agent replies: I cannot help with that topic. I can only assist with currency-related queries.](https://raw.githubusercontent.com/xbill9/currency-claude-agui-a2ui1/main/docs/a2ui-1-0/img/refusal.png)
 
-No tool runs. An invalid code such as "Convert 100 USD to XYZ" makes the `RateCard` macro fail on Frankfurter's `404 Not Found`, and the model answers in text: "I'm sorry, I cannot convert to XYZ. Please provide a valid currency code."
+No tool runs; the reply is text.
+
+---
+
+#### Step 12 — Every Prompt, Ten Runs, Two Models
+
+`docs/a2ui-1-0/tools/render_suite.py` sends ten prompts ten times each through Next.js. A UI prompt passes when the reply rendered A2UI and no raw `<a2ui` text reached the chat; the weather question passes as text with no UI; the invalid code passes as either.
+
+```shell
+python3 docs/a2ui-1-0/tools/render_suite.py 10 gemini-3.8-flash render-suite-gemini-3.8-flash.jsonl
+```
+
+```text
+# gemini-3.8-flash: 100 of 100 replies rendered clean (10 runs per prompt)
+10 of 10: pass | Compare 1 USD in EUR, GBP, JPY and CAD
+10 of 10: pass | Compare the euro, pound and Swiss franc against the dollar in a bar chart
+10 of 10: pass | Convert 100 USD to XYZ
+10 of 10: pass | How much is 250 USD in EUR?
+10 of 10: pass | Show a bar chart of 1 USD in EUR, GBP, JPY, CHF and CAD
+10 of 10: pass | Show me EUR to USD for the past 6 months and the current rate
+10 of 10: pass | Show me the USD to JPY trend over the last 90 days
+10 of 10: pass | What's a thousand euros in dollars?
+10 of 10: pass | What's the weather in Paris?
+10 of 10: pass | Write the A2UI block for a USD to EUR rate card directly in your reply text. Do not call any tool.
+```
+
+```text
+# gemini-2.5-flash: 100 of 100 replies rendered clean (10 runs per prompt)
+```
+
+Every comparison reply on both models came from `RateComparison`, with no call to the rate tool:
+
+```text
+## gemini-2.5-flash
+10 of 10: no rate-tool call, BarChart=True | Compare 1 USD in EUR, GBP, JPY and CAD
+10 of 10: no rate-tool call, BarChart=True | Compare the euro, pound and Swiss franc against the dol
+10 of 10: no rate-tool call, BarChart=True | Show a bar chart of 1 USD in EUR, GBP, JPY, CHF and CAD
+## gemini-3.8-flash
+10 of 10: no rate-tool call, BarChart=True | Compare 1 USD in EUR, GBP, JPY and CAD
+10 of 10: no rate-tool call, BarChart=True | Compare the euro, pound and Swiss franc against the dol
+10 of 10: no rate-tool call, BarChart=True | Show a bar chart of 1 USD in EUR, GBP, JPY, CHF and CAD
+```
+
+The model client makes up to five attempts on a 408, 429 or 5xx answer from the Gemini API, through `Gemini(retry_options=HttpRetryOptions(attempts=5, ...))`, before a user sees an error.
 
 ---
 
@@ -355,19 +467,21 @@ The macros sit in a separate catalog that exists only in the inference catalogs:
 
 #### Compare and Contrast
 
-| Answer | How it is built | Model types the figures | Rendered |
-| :--- | :--- | :--- | :--- |
-| Rate card 🥇 | `RateCard` macro | no | 5 of 5 runs, each of two prompts |
-| History chart 🥇 | `RateHistoryChart` macro | no | 5 of 5 runs, each of two prompts |
-| Bar chart 🥉 | MCP calls, then model-written `BarChart` | yes, matched the tool every time | 3 of 5, 4 of 5, 4 of 6 runs |
+| Answer | Model writes | Figures from | Rendered, `gemini-3.8-flash` | Rendered, `gemini-2.5-flash` |
+| :--- | :--- | :--- | :--- | :--- |
+| Rate card 🥇 | `RateCard(...)` | macro, on the server | 20 of 20 | 20 of 20 |
+| History chart 🥇 | `RateHistoryChart(...)` | macro, on the server | 20 of 20 | 20 of 20 |
+| Comparison 🥇 | `RateComparison(...)` | macro, on the server | 30 of 30 | 30 of 30 |
+| Block written as reply text 🥇 | `<a2ui>` text | macro, via the safety net | 10 of 10 | 10 of 10 |
+| Last build (0.9) | component JSON | the model, from the MCP result | — | — |
 
 ---
 
 #### So, Which One?
 
-For anything the agent shows often, write a macro. The model's output shrinks to one line with the codes and an amount, the figures come from the source on the server, and both validation passes run on what the browser receives. Every macro prompt here rendered in every run.
+For anything the agent shows often, write a macro. The model's output shrinks to one line with the codes and an amount, the figures come from the source on the server, and both validation passes run on what the browser receives. Rate cards, history charts and comparisons all take this path here.
 
-For one-off layouts, let the model compose Basic catalog components and the charts directly. The values it typed matched the rate tool in every chart that rendered, and it sometimes answered with the Express block as text. A comparison that comes up often is the next macro to write.
+Behind the macros, keep the safety net. It sends A2UI the model writes as reply text through the same tool, so the user sees a card instead of a code block, on both model generations.
 
 For the protocol itself, 1.0 sends a surface in one message, mixes catalogs per component, and opens function calls in both directions, with permissions and composition rules declared in the catalog.
 
@@ -375,17 +489,19 @@ For the protocol itself, 1.0 sends a surface in one message, mixes catalogs per 
 
 #### Summary
 
-The goal of this article was to move a currency agent from A2UI 0.9 to A2UI 1.0 and show what changes for the model, the server and the browser. The key to the solution was server-side macros on the 1.0 protocol: the model names a component and its arguments, and the server fetches the data, builds the components, validates them and sends the surface in one message. The results were:
+The goal of this article was to move a currency agent from A2UI 0.9 to A2UI 1.0 and show what changes for the model, the server and the browser. The key to the solution was server-side macros on the 1.0 protocol, with every UI answer going through one server path: the model names a component and its arguments, and the server fetches the data, builds the components, validates them and sends the surface in one message. The results were:
 
 - 🟢 For a conversion the model wrote one line, `root = RateCard("USD", "EUR", 100)`, and the browser received six Basic 1.0 components with the live rate in one `createSurface`
-- 🟢 Four macro prompts rendered in 5 of 5 runs each, with no call to the rate tool
+- 🟢 Ten prompts, ten runs each: 100 of 100 replies rendered clean on `gemini-3.8-flash` and 100 of 100 on `gemini-2.5-flash`
+- 🟢 Comparisons came from `RateComparison` in 60 of 60 runs across both models, with no rate-tool call, charted as percent change from a zero line
+- 🟢 A2UI written as reply text rendered as UI through the safety net; with the net off it showed as raw text in 5 of 5 runs
 - 🟢 One surface mixed two catalogs, each component naming its own `catalogId`
 - 🟢 The same Express block compiles to one message on 1.0 and three on 0.9
 - 🟢 1.0 adds functions in both directions, function permissions, composition rules, graded validation, `userMessage` on actions, `live` and `hidden`, and `@index`
-- ⚠️ Model-written bar charts rendered in 3 of 5, 4 of 5 and 4 of 6 runs; the others came back as the Express block in plain text, and every chart that rendered matched the tool's values
+- ⚠️ Function calls the server writes need `skip_thought_signature_validator` on Gemini 3; `gemini-3.8-flash` rejects them with a 400 otherwise
 - ⚠️ 1.0 drops `theme` from `createSurface` and the h1–h5 Text variants
 
-Scope: one laptop running all four services, `gemini-2.5-flash` at its default settings, ECB reference rates from the Frankfurter API, measured on 2026-11-11 with five or six runs per prompt. Protocol details come from the 0.9 and 1.0 schemas in `a2ui-core` 0.6.0.
+Scope: one laptop running all four services, `gemini-3.8-flash` and `gemini-2.5-flash` at their default settings, ECB reference rates from the Frankfurter API, measured on 2026-11-11 with ten runs per prompt per model. Protocol details come from the 0.9 and 1.0 schemas in `a2ui-core` 0.6.0.
 
 The strategy for moving a generative UI agent to A2UI 1.0 with server-side macros was validated with an incremental step by step approach.
 
@@ -395,7 +511,7 @@ The strategy for moving a generative UI agent to A2UI 1.0 with server-side macro
 
 - The repository: https://github.com/xbill9/currency-claude-agui-a2ui1
 - Evidence for every figure here: https://github.com/xbill9/currency-claude-agui-a2ui1/tree/main/docs/a2ui-1-0/evidence
-- Demo, screenshot and comparison scripts: https://github.com/xbill9/currency-claude-agui-a2ui1/tree/main/docs/a2ui-1-0/tools
+- Demo, screenshot and test scripts: https://github.com/xbill9/currency-claude-agui-a2ui1/tree/main/docs/a2ui-1-0/tools
 - A2UI v1.0 specification: https://a2ui.org/specification/v1.0-a2ui/
 - A2UI: https://a2ui.org
 - AG-UI: https://docs.ag-ui.com

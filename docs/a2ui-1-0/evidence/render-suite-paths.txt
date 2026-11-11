@@ -1,0 +1,9 @@
+# How each reply was built, from render-suite-*.jsonl (counted by script)
+## gemini-2.5-flash
+10 of 10: no rate-tool call, BarChart=True | Compare 1 USD in EUR, GBP, JPY and CAD
+10 of 10: no rate-tool call, BarChart=True | Compare the euro, pound and Swiss franc against the dol
+10 of 10: no rate-tool call, BarChart=True | Show a bar chart of 1 USD in EUR, GBP, JPY, CHF and CAD
+## gemini-3.8-flash
+10 of 10: no rate-tool call, BarChart=True | Compare 1 USD in EUR, GBP, JPY and CAD
+10 of 10: no rate-tool call, BarChart=True | Compare the euro, pound and Swiss franc against the dol
+10 of 10: no rate-tool call, BarChart=True | Show a bar chart of 1 USD in EUR, GBP, JPY, CHF and CAD

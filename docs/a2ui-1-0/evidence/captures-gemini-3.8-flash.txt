@@ -1,0 +1,119 @@
+# Captured 2026-11-11T21:55:12Z through Next.js, gemini-3.8-flash
+## Convert 100 USD to EUR please.
+### What the model wrote
+send_a2ui_json_to_client:
+<a2ui>
+surface("conversion")
+root = RateCard("USD", "EUR", 100)
+</a2ui>
+### What reached the browser
+version 1.0, ['createSurface'], 6 components
+  https://a2ui.org/specification/v1_0/catalogs/basic/catalog.json: ['Text', 'Text', 'Divider', 'Text', 'Column', 'Card']
+  Text: ### 100.00 USD = 89.87 EUR
+  Text: 1 USD = 0.89871 EUR
+  Text: ECB reference rate for 2026-11-11 (Frankfurter API)
+
+## Show me EUR to USD for the past 6 months and the current rate
+### What the model wrote
+send_a2ui_json_to_client:
+<a2ui>
+surface("main")
+root = Column([rateCard, historyChart])
+rateCard = RateCard("EUR", "USD")
+historyChart = RateHistoryChart("EUR", "USD", 180)
+</a2ui>
+### What reached the browser
+version 1.0, ['createSurface'], 12 components
+  https://a2ui.org/specification/v1_0/catalogs/basic/catalog.json: ['Column', 'Text', 'Text', 'Divider', 'Text', 'Column', 'Card', 'Text', 'Text', 'Column', 'Card']
+  https://a2ui.org/catalog/currency-charts/v1/catalog.json: ['LineChart']
+  Text: ### 1.00 EUR = 1.11 USD
+  Text: 1 EUR = 1.11270 USD
+  Text: ECB reference rate for 2026-11-11 (Frankfurter API)
+  Text: ### EUR → USD, last 180 days
+  LineChart: EUR/USD (2026-05-15 to 2026-11-11) | ['05-15', '05-18', '05-19', '05-20', '05-21', '05-22', '05-25', '05-26', '05-27', '05-28'] | 129 points
+  Text: Low 1.11270 · High 1.16990 · Latest 1.11270
+
+## Compare the euro, pound and Swiss franc against the dollar in a bar chart
+### What the model wrote
+send_a2ui_json_to_client:
+<a2ui>
+surface("main")
+root = RateComparison("USD", ["EUR", "GBP", "CHF"])
+</a2ui>
+### What reached the browser
+version 1.0, ['createSurface'], 8 components
+  https://a2ui.org/specification/v1_0/catalogs/basic/catalog.json: ['Text', 'Text', 'Text', 'Text', 'Text', 'Column', 'Card']
+  https://a2ui.org/catalog/currency-charts/v1/catalog.json: ['BarChart']
+  Text: ### 1 USD against 3 currencies
+  Text: 1 USD = 0.89871 EUR
+  Text: 1 USD = 0.75149 GBP
+  Text: 1 USD = 0.82987 CHF
+  BarChart: Change in the USD rate, 2026-10-12 to 2026-11-11 (%) | ['EUR', 'GBP', 'CHF'] | [0.49, -0.54, -0.36]
+  Text: ECB reference rates for 2026-11-11 (Frankfurter API)
+
+## Show me the USD to JPY trend over the last 90 days
+### What the model wrote
+send_a2ui_json_to_client:
+<a2ui>
+surface("main")
+root = RateHistoryChart("USD", "JPY", 90)
+</a2ui>
+### What reached the browser
+version 1.0, ['createSurface'], 5 components
+  https://a2ui.org/specification/v1_0/catalogs/basic/catalog.json: ['Text', 'Text', 'Column', 'Card']
+  https://a2ui.org/catalog/currency-charts/v1/catalog.json: ['LineChart']
+  Text: ### USD → JPY, last 90 days
+  LineChart: USD/JPY (2026-08-13 to 2026-11-11) | ['08-13', '08-14', '08-17', '08-18', '08-19', '08-20', '08-21', '08-24', '08-25', '08-26'] | 65 points
+  Text: Low 153.27000 · High 160.16000 · Latest 159.23000
+
+## What's a thousand euros in dollars?
+### What the model wrote
+send_a2ui_json_to_client:
+<a2ui>
+surface("main")
+root = RateCard("EUR", "USD", 1000)
+</a2ui>
+### What reached the browser
+version 1.0, ['createSurface'], 6 components
+  https://a2ui.org/specification/v1_0/catalogs/basic/catalog.json: ['Text', 'Text', 'Divider', 'Text', 'Column', 'Card']
+  Text: ### 1,000.00 EUR = 1,112.70 USD
+  Text: 1 EUR = 1.11270 USD
+  Text: ECB reference rate for 2026-11-11 (Frankfurter API)
+
+## How has the British pound done against the euro this year?
+### What the model wrote
+send_a2ui_json_to_client:
+<a2ui>
+surface("main")
+root = RateHistoryChart("GBP", "EUR", 365)
+</a2ui>
+### What reached the browser
+version 1.0, ['createSurface'], 5 components
+  https://a2ui.org/specification/v1_0/catalogs/basic/catalog.json: ['Text', 'Text', 'Column', 'Card']
+  https://a2ui.org/catalog/currency-charts/v1/catalog.json: ['LineChart']
+  Text: ### GBP → EUR, last 365 days
+  LineChart: GBP/EUR (2025-11-11 to 2026-11-11) | ['11-11', '11-12', '11-13', '11-14', '11-17', '11-18', '11-19', '11-20', '11-21', '11-24'] | 256 points
+  Text: Low 1.13050 · High 1.19960 · Latest 1.19590
+
+## Convert 100 USD to XYZ
+### What the model wrote
+send_a2ui_json_to_client:
+<a2ui>
+surface("main")
+root = RateCard("USD", "XYZ", 100)
+</a2ui>
+send_a2ui_json_to_client:
+<a2ui>
+surface("main")
+root = Card(content)
+content = Column([errorIcon, titleText, descText])
+errorIcon = Icon("error")
+titleText = Text("**Unsupported Currency**")
+descText = Text("'XYZ' is not a valid or recognized currency code. Please specify a valid ISO 4217 currency code, such as EUR, GBP, JPY, or CAD.")
+</a2ui>
+### What reached the browser
+version 1.0, ['createSurface'], 5 components
+  https://a2ui.org/specification/v1_0/catalogs/basic/catalog.json: ['Card', 'Column', 'Icon', 'Text', 'Text']
+  Text: **Unsupported Currency**
+  Text: 'XYZ' is not a valid or recognized currency code. Please specify a valid ISO 4217 currency code, such as EUR, GBP, JPY, or CAD.
+

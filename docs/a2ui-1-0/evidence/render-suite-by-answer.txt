@@ -1,0 +1,10 @@
+# Clean renders by kind of answer, from render-suite-*.jsonl (counted by script)
+gemini-3.8-flash | Rate card: 20 of 20
+gemini-3.8-flash | History chart: 20 of 20
+gemini-3.8-flash | Comparison: 30 of 30
+gemini-3.8-flash | Block written as reply text: 10 of 10
+gemini-2.5-flash | Rate card: 20 of 20
+gemini-2.5-flash | History chart: 20 of 20
+gemini-2.5-flash | Comparison: 30 of 30
+gemini-2.5-flash | Block written as reply text: 10 of 10
+Comparison replies from RateComparison with no rate-tool call, both models: 60 of 60

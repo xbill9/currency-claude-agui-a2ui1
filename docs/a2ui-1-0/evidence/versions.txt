@@ -21,5 +21,5 @@ react 19.2.7
 @ag-ui/client 0.0.52
 
 ## Model
-108:    model=os.getenv("GENAI_MODEL", "gemini-2.5-flash"),
-GENAI_MODEL unset in the demo environment, so the default applied
+model=os.getenv("GENAI_MODEL", "gemini-3.8-flash"),
+Default gemini-3.8-flash; the render suite also ran with GENAI_MODEL=gemini-2.5-flash.

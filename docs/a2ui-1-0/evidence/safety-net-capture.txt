@@ -1,0 +1,18 @@
+# Captured 2026-11-11T21:55:19Z through Next.js, gemini-3.8-flash, safety net on
+## Write the A2UI block for a USD to EUR rate card directly in your reply text. Do not call any tool.
+### What the model wrote
+send_a2ui_json_to_client:
+<a2ui>
+surface("main")
+root = RateCard("USD", "EUR")
+</a2ui>
+### What reached the browser
+version 1.0, ['createSurface'], 6 components
+  https://a2ui.org/specification/v1_0/catalogs/basic/catalog.json: ['Text', 'Text', 'Divider', 'Text', 'Column', 'Card']
+  Text: ### 1.00 USD = 0.90 EUR
+  Text: 1 USD = 0.89871 EUR
+  Text: ECB reference rate for 2026-11-11 (Frankfurter API)
+
+### Bridge log during this request
+[INFO]: A2UI written as reply text: sent 1 block(s) through send_a2ui_json_to_client
+[INFO]: Validated call to tool send_a2ui_json_to_client with a2ui_payload
