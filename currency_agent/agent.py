@@ -30,10 +30,13 @@ from google.adk.a2a.executor.a2a_agent_executor import (
 )
 from google.adk.a2a.utils.agent_to_a2a import to_a2a
 from google.adk.agents import LlmAgent
+from google.adk.models.google_llm import Gemini
 from google.adk.tools.mcp_tool import McpToolset, StreamableHTTPConnectionParams
+from google.genai import types as genai_types
 from pydantic import TypeAdapter
 from starlette.responses import JSONResponse
 
+from currency_agent.a2ui_rescue import rescue_a2ui_text
 from currency_agent.macros import CHARTS_CATALOG, MACROS
 
 logger = logging.getLogger(__name__)
@@ -60,10 +63,11 @@ ROLE_INSTRUCTION = (
     "politely state that you cannot help with that topic and can only assist with currency-related queries. "
     "Do not attempt to answer unrelated questions or use tools for other purposes.\n\n"
     "Show results as A2UI. Prefer the server-side macros: RateCard for a rate or a "
-    "conversion, RateHistoryChart for trends or history over time. These macros look "
-    "up the figures on the server, so pass only currency codes and the amount or day "
-    "count. Use Basic catalog components (Card, Column, Row, Text) or BarChart only "
-    "for layouts the macros do not cover, such as comparing several currencies."
+    "conversion, RateHistoryChart for trends or history over time, RateComparison for "
+    "comparing several currencies against one. These macros look up the figures on the "
+    "server, so pass only currency codes and the amount or day count; do not call "
+    "get_exchange_rate first. Use Basic catalog components (Card, Column, Row, Text) "
+    "or the charts only for layouts the macros do not cover."
 )
 
 _message_adapter: TypeAdapter[AgentToRendererMessage] = TypeAdapter(
@@ -105,10 +109,21 @@ a2ui_toolset = MacroSendA2uiToClientToolset(
 )
 
 root_agent = LlmAgent(
-    model=os.getenv("GENAI_MODEL", "gemini-2.5-flash"),
+    # Temporary model errors (429, 5xx) are retried before they reach the user.
+    model=Gemini(
+        model=os.getenv("GENAI_MODEL", "gemini-3.8-flash"),
+        retry_options=genai_types.HttpRetryOptions(
+            attempts=5,
+            initial_delay=1,
+            max_delay=8,
+            http_status_codes=[408, 429, 500, 502, 503, 504],
+        ),
+    ),
     name="currency_agent",
     description="An agent that can help with currency conversions",
     instruction=ROLE_INSTRUCTION,
+    # A2UI written into the reply text goes through the UI tool all the same.
+    after_model_callback=rescue_a2ui_text,
     tools=[
         a2ui_toolset,
         McpToolset(

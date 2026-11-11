@@ -27,13 +27,15 @@ Lint is clean with the system ruff (0.16.7, which turns on many more rules than 
 
 - **Main path is AG-UI + React:** browser → Next `/api/copilotkit` (`AGENT_URL`, default `http://localhost:8008/`) → `frontend-react/agent/main.py`, which imports `currency_agent.agent.root_agent` in-process → MCP on :8080. The A2A server (:10000) is a second entry point to the same agent and is what `cloudbuild.yaml` deploys to Cloud Run; keep it working.
 - **Legacy `frontend/`** (FastAPI + Vite, talks A2A on :10000) was not migrated to A2UI 1.0 but must keep working — update it alongside changes that affect it. Its `Makefile`/`package.json` names are leftovers from another project.
-- **Model:** target `gemini-3.8-flash`, set via `GENAI_MODEL` (code default in `currency_agent/agent.py` is still `gemini-2.5-flash`). Never suggest models older than 2.5.
+- **Model:** `gemini-3.8-flash` by default, overridden by `GENAI_MODEL`; `Gemini(retry_options=...)` retries 408/429/5xx. Never suggest models older than 2.5.
 
 ## A2UI 1.0 pipeline (`currency_agent/agent.py`, `macros.py`)
 
 - The model writes A2UI **Express** format (`A2uiRequestProcessor` default). `MacroSendA2uiToClientToolset._parse_payload` compiles it, validates against `INFERENCE_CATALOGS` (base + macro sidecar), runs `macro_expander.transform_to_transport`, then re-validates against `BASE_CATALOGS` (Basic 1.0 + charts). Both validations must pass.
-- **Server-side macros** (`RateCard`, `RateHistoryChart`) fetch rates from Frankfurter on the server so figures never pass through the model. Treat macro arguments as untrusted: validate (`_code`) and clamp. Adding one: `/add-a2ui-macro`.
+- **Server-side macros** (`RateCard`, `RateHistoryChart`, `RateComparison`) fetch rates from Frankfurter on the server so figures never pass through the model. Treat macro arguments as untrusted: validate (`_code`) and clamp. Adding one: `/add-a2ui-macro`.
 - The charts catalog id `https://a2ui.org/catalog/currency-charts/v1/catalog.json` and component props must match between `currency_agent/custom_catalog.json` and `frontend-react/src/components/A2UICustomCatalog.tsx`.
+- `currency_agent/a2ui_rescue.py` (the agent's `after_model_callback`) turns an `<a2ui>` block the model writes as reply text into a `send_a2ui_json_to_client` call and holds it out of the stream. The call it writes carries `thought_signature=b"skip_thought_signature_validator"`; Gemini 3 rejects a current-turn function call without one (400). Keep both.
+- Every UI answer should go through a macro or the UI tool. `docs/a2ui-1-0/tools/render_suite.py RUNS MODEL OUT.jsonl` (stack running) runs the demo prompts and counts clean renders; keep it at 100%.
 - CopilotKit's built-in A2UI middleware speaks v0.9, so it is disabled in `route.ts`; rendering goes through `useRenderTool("send_a2ui_json_to_client")` reading `validated_a2ui_json`. Re-sending `createSurface` for a live surface fails. `@a2ui/react` must load client-only.
 
 ## Gotchas

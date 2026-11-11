@@ -7,35 +7,89 @@
       "type": "object",
       "description": "Renders a vertical bar chart for comparing exchange rates.",
       "properties": {
-        "component": { "const": "BarChart" },
-        "title": { "type": "string" },
-        "labels": { "type": "array", "items": { "type": "string" } },
-        "values": { "type": "array", "items": { "type": "number" } },
-        "color": { "type": "string" }
+        "component": {
+          "const": "BarChart"
+        },
+        "title": {
+          "type": "string"
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "color": {
+          "type": "string"
+        },
+        "decimals": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 6,
+          "description": "Decimal places for the value labels. Defaults to 4."
+        }
       },
-      "required": ["component", "labels", "values"]
+      "required": [
+        "component",
+        "labels",
+        "values"
+      ]
     },
     "LineChart": {
       "type": "object",
       "description": "Renders an SVG line chart for showing exchange rate history over time.",
       "properties": {
-        "component": { "const": "LineChart" },
-        "title": { "type": "string" },
-        "labels": { "type": "array", "items": { "type": "string" } },
-        "values": { "type": "array", "items": { "type": "number" } },
-        "color": { "type": "string" }
+        "component": {
+          "const": "LineChart"
+        },
+        "title": {
+          "type": "string"
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "color": {
+          "type": "string"
+        }
       },
-      "required": ["component", "labels", "values"]
+      "required": [
+        "component",
+        "labels",
+        "values"
+      ]
     }
   },
   "$defs": {
     "anyComponent": {
       "oneOf": [
-        { "$ref": "#/components/BarChart" },
-        { "$ref": "#/components/LineChart" }
+        {
+          "$ref": "#/components/BarChart"
+        },
+        {
+          "$ref": "#/components/LineChart"
+        }
       ],
-      "discriminator": { "propertyName": "component" }
+      "discriminator": {
+        "propertyName": "component"
+      }
     },
-    "anyFunction": { "not": {} }
+    "anyFunction": {
+      "not": {}
+    }
   }
 }

@@ -46,6 +46,7 @@ class BarChart(ComponentBuilderNode):
     labels: list[str]
     values: list[float]
     color: str | None = None
+    decimals: int | None = None
 
 
 def _code(value: str) -> str:
@@ -126,4 +127,55 @@ def RateHistoryChart(currency_from: str, currency_to: str, days: int = 30) -> Ca
     )
 
 
-MACROS = [RateCard, RateHistoryChart]
+@macro
+def RateComparison(currency_from: str, currencies: list[str], days: int = 30) -> Card:
+    """Card comparing several currencies against one base currency: today's rate
+    for each, and a bar chart of how much each rate moved over the period, in
+    percent. The server looks up every rate, so do not pass rate figures.
+
+    Args:
+        currency_from: ISO 4217 code of the base currency, such as "USD".
+        currencies: Two to ten ISO 4217 codes to compare, such as ["EUR", "GBP"].
+        days: Number of calendar days for the change, from 7 to 365. Defaults to 30.
+    """
+    src = _code(currency_from)
+    codes: list[str] = []
+    for value in currencies:
+        code = _code(value)
+        if code != src and code not in codes:
+            codes.append(code)
+    if not 2 <= len(codes) <= 10:
+        raise ValueError(f"compare 2 to 10 currencies other than {src}, got {codes}")
+    days = max(7, min(int(days), 365))
+    to = ",".join(codes)
+    latest = _get("latest", **{"from": src, "to": to})
+    start = (dt.datetime.now(dt.UTC).date() - dt.timedelta(days=days)).isoformat()
+    history = _get(f"{start}..", **{"from": src, "to": to})
+    series = sorted(history["rates"].items())
+    first, last = series[0][1], series[-1][1]
+    change = [round((last[c] / first[c] - 1) * 100, 2) for c in codes]
+    rows = [Text(text=f"1 {src} = {latest['rates'][c]:.5f} {c}") for c in codes]
+    return Card(
+        child=Column(
+            children=[
+                Text(text=f"### 1 {src} against {len(codes)} currencies"),
+                *rows,
+                BarChart(
+                    title=(
+                        f"Change in the {src} rate, {history['start_date']}"
+                        f" to {history['end_date']} (%)"
+                    ),
+                    labels=codes,
+                    values=change,
+                    decimals=2,
+                ),
+                Text(
+                    text=f"ECB reference rates for {latest['date']} (Frankfurter API)",
+                    variant="caption",
+                ),
+            ]
+        )
+    )
+
+
+MACROS = [RateCard, RateHistoryChart, RateComparison]

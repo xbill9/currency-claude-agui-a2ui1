@@ -41,7 +41,8 @@ flowchart LR
 Libraries: `a2ui-agent-sdk` 0.11.0, `a2ui-adk` 0.3.0 and `a2ui-core` 0.6.0 on the agent; `@a2ui/react` 0.15.0 and `@a2ui/web_core/v1_0` in the React UI.
 
 - **Express inference format.** The model writes compact `<a2ui>` blocks. `A2uiRequestProcessor` compiles and validates them into v1.0 messages (`createSurface` with embedded components and `{"@path": ...}` bindings).
-- **Server-side macros** (`currency_agent/macros.py`). `RateCard(from, to, amount)` and `RateHistoryChart(from, to, days)` are components the model calls in one line. `MacroExpander` runs them on the agent, where they fetch rates from the Frankfurter API and expand into Basic catalog `Card`/`Column`/`Text` plus the custom `LineChart`. The rate figures never pass through the model's context, and the macros accept only three-letter currency codes and a clamped day range.
+- **Server-side macros** (`currency_agent/macros.py`). `RateCard(from, to, amount)`, `RateHistoryChart(from, to, days)` and `RateComparison(base, [codes], days)` are components the model calls in one line. `MacroExpander` runs them on the agent, where they fetch rates from the Frankfurter API and expand into Basic catalog `Card`/`Column`/`Text` plus the custom `LineChart` and `BarChart`. The rate figures never pass through the model's context, and the macros accept only three-letter currency codes and a clamped day range.
+- **A2UI written as text still renders.** If the model writes an `<a2ui>` block into its reply instead of calling the UI tool, `currency_agent/a2ui_rescue.py` holds it out of the chat and sends it through the same tool.
 - **Two validation passes.** The payload is checked against the inference catalogs (Basic + charts + macro definitions), then again after expansion against the catalogs the renderer implements (Basic 1.0 + charts).
 - **Custom catalog** (`currency_agent/custom_catalog.json`, `protocolVersion: "1.0"`) adds `LineChart` and `BarChart`. Its catalog id must match `frontend-react/src/components/A2UICustomCatalog.tsx`.
 - **React renderer.** Results of the `send_a2ui_json_to_client` tool are rendered by `@a2ui/react` with a per-turn `MessageProcessor` (`frontend-react/src/components/A2uiMessages.tsx`). CopilotKit's built-in A2UI middleware speaks v0.9, so it is turned off.
@@ -82,7 +83,7 @@ echo "GOOGLE_CLOUD_PROJECT=<your_project_id>" >> .env
 echo "GOOGLE_CLOUD_LOCATION=us-central1" >> .env
 ```
 
-The agent uses `gemini-2.5-flash` unless `GENAI_MODEL` is set in `.env`.
+The agent uses `gemini-3.8-flash` unless `GENAI_MODEL` is set in `.env`.
 
 ---
 

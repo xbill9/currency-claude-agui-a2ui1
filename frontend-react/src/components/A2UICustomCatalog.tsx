@@ -37,7 +37,12 @@ const chartProps = z.object({
 });
 type ChartProps = z.infer<typeof chartProps>;
 
-function BarChartView({ title, labels, values, color = "#10b981" }: ChartProps) {
+const barChartProps = chartProps.extend({
+  decimals: z.number().int().min(0).max(6).optional(),
+});
+type BarChartProps = z.infer<typeof barChartProps>;
+
+function BarChartView({ title, labels, values, color = "#10b981", decimals = 4 }: BarChartProps) {
   const minVal = Math.min(...values);
   const maxVal = Math.max(...values);
   const range = maxVal - minVal;
@@ -52,7 +57,7 @@ function BarChartView({ title, labels, values, color = "#10b981" }: ChartProps) 
           const heightPercent = range > 0 ? ((val - baseline) / denom) * 100 : 100;
           return (
             <div key={idx} className="flex flex-col items-center flex-1 h-full gap-2">
-              <span className="text-[10px] text-white font-medium">{val.toFixed(4)}</span>
+              <span className="text-[10px] text-white font-medium">{val.toFixed(decimals)}</span>
               {/* The bar's % height needs a parent with a definite height. */}
               <div className="flex-1 w-full flex items-end justify-center">
                 <div
@@ -130,8 +135,8 @@ function LineChartView({ title, labels, values, color = "#3b82f6" }: ChartProps)
 }
 
 const BarChart = createComponentImplementation(
-  { name: "BarChart", schema: chartProps },
-  ({ props }) => <BarChartView {...(props as ChartProps)} />,
+  { name: "BarChart", schema: barChartProps },
+  ({ props }) => <BarChartView {...(props as BarChartProps)} />,
 );
 
 const LineChart = createComponentImplementation(
