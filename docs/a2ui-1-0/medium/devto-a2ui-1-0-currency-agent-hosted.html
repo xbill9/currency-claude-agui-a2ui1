@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc 3.11" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>A2UI 1.0 in a Currency Agent: One Message per Surface, Mixed Catalogs and Server-Side Macros</title>
+  <meta name="description" content="A Google ADK currency agent moves from A2UI 0.9 to A2UI 1.0: what changed in the protocol, what 1.0 can do that 0.9 could not, and how server-side macros let the model write one line while the server fills in the rates." />
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      white-space: pre-wrap;
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <style>
+    body{font-family:-apple-system,'Segoe UI',Roboto,'Liberation Sans',Arial,sans-serif;
+         font-size:18px;line-height:1.58;max-width:42em;color:#242424;}
+    h1,h2,h3,h4{font-weight:700;line-height:1.25;margin-top:1.8em;}
+    h4{font-size:1.25em;}
+    img{max-width:100%;height:auto;display:block;margin:1.6em 0;}
+    pre{background:#f7f7f7;border:1px solid #e6e6e6;border-radius:4px;
+        padding:12px 14px;overflow-x:auto;font-size:14px;line-height:1.45;}
+    code{font-family:'Liberation Mono',Menlo,Consolas,monospace;}
+    :not(pre)>code{background:#f2f2f2;padding:1px 5px;border-radius:3px;font-size:.9em;}
+    blockquote{border-left:3px solid #ddd;margin-left:0;padding-left:1em;color:#555;}
+    hr{border:0;border-top:1px solid #e6e6e6;margin:2.4em 0;}
+  </style>
+</head>
+<body>
+<p>This article provides a step by step guide to a currency agent that
+answers with generated UI on A2UI 1.0. A Google ADK agent on Gemini
+looks up exchange rates, describes its answer as A2UI components, and a
+Next.js CopilotKit front end renders the cards and charts over AG-UI. It
+covers what changed from the A2UI 0.9 build to this one, what changed in
+the protocol, and what 1.0 adds.</p>
+<figure><img src="https://raw.githubusercontent.com/xbill9/currency-claude-agui-a2ui1/main/docs/a2ui-1-0/medium/img/devto-cover.b6f0e686.jpg" alt="A2UI 1.0 in a Currency Agent: One Message per Surface, Mixed Catalogs and Server-Side Macros" /></figure>
+<p><a
+href="https://github.com/xbill9/currency-claude-agui-a2ui1">https://github.com/xbill9/currency-claude-agui-a2ui1</a></p>
+<p><strong>On A2UI 1.0 the model writes one line, and the server fills
+in the numbers.</strong> For "Convert 100 USD to EUR" the model's whole
+UI is <code>root = RateCard("USD", "EUR", 100)</code>. A server-side
+macro fetches the rate from the Frankfurter API, expands the line into
+six Basic catalog components, and the browser receives them in a single
+<code>createSurface</code> message. On the 0.9 build the model called
+the rate tool, read the result, and typed every figure into the
+component JSON. Ten prompts, run ten times each, rendered cleanly in 100
+of 100 replies on <code>gemini-3.8-flash</code> and 100 of 100 on
+<code>gemini-2.5-flash</code>.</p>
+<hr />
+<h4 id="what-is-being-built">What Is Being Built?</h4>
+<p><img
+src="https://raw.githubusercontent.com/xbill9/currency-claude-agui-a2ui1/main/docs/a2ui-1-0/img/architecture.png"
+alt="Architecture: the browser talks AG-UI to a bridge on port 8008, A2A clients talk to a server on port 10000, both run the same ADK agent, which calls the MCP server on port 8080 and the Frankfurter API" /></p>
+<p><img src="https://raw.githubusercontent.com/xbill9/currency-claude-agui-a2ui1/main/docs/a2ui-1-0/medium/img/devto-a2ui-1-0-currency-agent-table-1.png"
+alt="Table: Service, Port, Code" /></p>
+<p>Next.js forwards <code>/api/copilotkit</code> to the AG-UI bridge,
+which imports the ADK agent and streams AG-UI events back. The A2A
+server runs the same agent object for A2A clients, and Cloud Build
+deploys it to Cloud Run.</p>
+<p>Versions, read from the machine on 2026-11-11:</p>
+<p><img src="https://raw.githubusercontent.com/xbill9/currency-claude-agui-a2ui1/main/docs/a2ui-1-0/medium/img/devto-a2ui-1-0-currency-agent-table-2.png"
+alt="Table: Component, Version" /></p>
+<hr />
+<h4 id="from-the-last-build-to-this-one">From the Last Build to This
+One</h4>
+<p><img
+src="https://raw.githubusercontent.com/xbill9/currency-claude-agui-a2ui1/main/docs/a2ui-1-0/img/before-after.png"
+alt="Before and after: on A2UI 0.9 the model calls the rate tool and writes the component JSON with the figures, the reply text carries a2ui-json blocks, and the browser cuts them out and repairs them; on A2UI 1.0 the model writes one macro call, the server compiles and validates it, the macro fetches the rate, the result is validated again and arrives as a tool result" /></p>
+<p><img src="https://raw.githubusercontent.com/xbill9/currency-claude-agui-a2ui1/main/docs/a2ui-1-0/medium/img/devto-a2ui-1-0-currency-agent-table-3.png"
+alt="Table: Last build: A2UI 0.9, This build: A2UI 1.0" /></p>
+<hr />
+<h4 id="what-changed-in-the-a2ui-10-protocol">What Changed in the A2UI
+1.0 Protocol?</h4>
+<p>Read from the installed <code>a2ui-core</code> 0.6.0, which ships the
+0.9 and 1.0 schemas side by side:</p>
+<p><img src="https://raw.githubusercontent.com/xbill9/currency-claude-agui-a2ui1/main/docs/a2ui-1-0/medium/img/devto-a2ui-1-0-currency-agent-table-4.png"
+alt="Table: A2UI 0.9, A2UI 1.0" /></p>
+<p>The Basic catalog's components are the same in both versions:
+AudioPlayer, Button, Card, CheckBox, ChoicePicker, Column,
+DateTimeInput, Divider, Icon, Image, List, Modal, Row, Slider, Tabs,
+Text, TextField and Video. Their properties moved: TextField gains
+<code>placeholder</code> and replaces <code>validationRegexp</code> with
+a <code>regex</code> check, Slider gains <code>steps</code>, and Video
+gains <code>posterUrl</code>.</p>
+<hr />
+<h4 id="what-can-a2ui-10-do-that-09-could-not">What Can A2UI 1.0 Do That
+0.9 Could Not?</h4>
+<ul>
+<li><strong>A whole surface in one message.</strong>
+<code>createSurface</code> carries the components and the data model
+inline, so a new surface needs one message.</li>
+<li><strong>Several catalogs on one surface.</strong> Each component can
+name its own <code>catalogId</code>, overriding the surface
+default.</li>
+<li><strong>Functions in both directions.</strong> The agent can call a
+renderer function (<code>callRendererFunction</code>) and the renderer
+can call an agent function (<code>callAgentFunction</code>), each with
+its own response message.</li>
+<li><strong>Function permissions.</strong> A catalog marks each function
+<code>rendererOnly</code>, <code>agentOnly</code> or
+<code>rendererOrAgent</code>, and can require a user gesture with
+<code>requiresUserActivation</code>.</li>
+<li><strong>Composition rules.</strong> A catalog can list
+<code>allowedParents</code> and <code>allowedChildren</code> per
+component, and the renderer reports violations with the new error codes
+<code>UNALLOWED_PARENT</code> and <code>UNALLOWED_CHILD</code>.</li>
+<li><strong>Graded validation.</strong> Checks return a validation
+result with a <code>severity</code> of error, warning or info.</li>
+<li><strong>Actions that speak.</strong> A button's action can carry a
+<code>userMessage</code>, which travels with the action to the
+agent.</li>
+<li><strong>Accessibility.</strong> Components take <code>live</code>
+(off, polite, assertive) and <code>hidden</code>.</li>
+<li><strong>List positions.</strong> The <code>@index</code> function
+returns an item's position inside a list template.</li>
+<li><strong>Extensions.</strong> Components, surfaces, actions and
+catalogs carry <code>metadata.extensions</code> for custom data.</li>
+<li><strong>Catalog instructions.</strong> A catalog definition can
+carry Markdown <code>instructions</code> for the model.</li>
+</ul>
+<hr />
+<h4 id="at-this-point-you-should-have">At This Point You Should
+Have…</h4>
+<ul>
+<li>Python 3.13 or newer and Node.js with npm</li>
+<li>A Gemini API key from Google AI Studio, or a Google Cloud project
+with Vertex AI enabled</li>
+<li>The repository cloned:</li>
+</ul>
+<pre class="shell"><code>git clone https://github.com/xbill9/currency-claude-agui-a2ui1.git
+cd currency-claude-agui-a2ui1</code></pre>
+<hr />
+<h4 id="step-1--install-and-configure">Step 1 — Install and
+Configure</h4>
+<pre class="shell"><code>make install
+echo &quot;GOOGLE_API_KEY=&lt;your_api_key_here&gt;&quot; &gt;&gt; .env
+echo &quot;GOOGLE_GENAI_USE_VERTEXAI=FALSE&quot; &gt;&gt; .env</code></pre>
+<p><code>make install</code> runs <code>uv sync</code> and
+<code>npm install</code> for both front ends. The agent uses
+<code>gemini-3.8-flash</code> unless <code>GENAI_MODEL</code> is set in
+<code>.env</code>.</p>
+<hr />
+<h4 id="step-2--start-the-stack">Step 2 — Start the Stack</h4>
+<pre class="shell"><code>make start
+curl -s http://127.0.0.1:10000/health
+curl -s http://127.0.0.1:8008/health
+{&quot;status&quot;:&quot;ok&quot;}
+{&quot;status&quot;:&quot;ok&quot;}</code></pre>
+<p><code>make start</code> launches the MCP server, the A2A server, the
+AG-UI bridge and the Next.js dev server in the background. The UI is at
+http://localhost:3000.</p>
+<hr />
+<h4 id="step-3--express-what-the-model-writes">Step 3 — Express: What
+the Model Writes</h4>
+<p>Express is the inference format in <code>a2ui-agent-sdk</code>: a
+short Python-like language inside <code>&lt;a2ui&gt;</code> tags that
+the server compiles into A2UI messages. <code>$/path</code> is a
+binding, <code>?required</code> is a check, and <code>root =</code>
+names the top component. The same block compiles to either protocol
+version:</p>
+<pre class="text"><code>surface(&quot;main&quot;)
+$/user/name = &quot;Ada&quot;
+title = Text(formatString(&quot;Hello ${/user/name}&quot;))
+btn = Button(Text(&quot;Save&quot;), action=Event(&quot;save&quot;, {name: $/user/name}, userMessage=&quot;Saving&quot;))
+root = Column([title, TextField(&quot;Name&quot;, $/user/name, checks=[?required(&quot;Name is required&quot;)]), btn])
+python3 docs/a2ui-1-0/tools/express_0_9_vs_1_0.py
+## A2UI 1.0: 1 message(s): [&#39;createSurface&#39;]
+## A2UI 0.9 (userMessage removed): 3 message(s): [&#39;createSurface&#39;, &#39;updateComponents&#39;, &#39;updateDataModel&#39;]
+## userMessage on 0.9
+ExpressValidationError: Event userMessage requires protocol v1.0 or later; the target version v0.9 has no userMessage field.</code></pre>
+<p>On 1.0 the text field's value is <code>{"@path": "/user/name"}</code>
+and its check is <code>{"@call": "required", ...}</code>, all inside the
+one <code>createSurface</code> along with
+<code>"dataModel": {"user": {"name": "Ada"}}</code>.</p>
+<hr />
+<h4 id="step-4--server-side-macros-the-model-writes-one-line">Step 4 —
+Server-Side Macros: The Model Writes One Line</h4>
+<p>A macro is a Python function the model calls like a component.
+<code>@macro</code> turns its type hints and docstring into a catalog
+entry, and at send time <code>MacroExpander</code> runs it and replaces
+it with Basic catalog components, so the browser needs no macro support.
+The macros live in <code>currency_agent/macros.py</code>:</p>
+<pre class="python"><code>@macro
+def RateCard(currency_from: str, currency_to: str, amount: float = 1.0) -&gt; Card:
+    &quot;&quot;&quot;Card with the live exchange rate and a converted amount. The server looks
+    up the rate, so do not pass rate figures.
+    &quot;&quot;&quot;
+    src, dst = _code(currency_from), _code(currency_to)
+    data = _get(&quot;latest&quot;, **{&quot;from&quot;: src, &quot;to&quot;: dst})
+    rate = data[&quot;rates&quot;][dst]
+    return Card(
+        child=Column(
+            children=[
+                Text(text=f&quot;### {amount:,.2f} {src} = {amount * rate:,.2f} {dst}&quot;),
+                Text(text=f&quot;1 {src} = {rate:.5f} {dst}&quot;),
+                Divider(),
+                Text(
+                    text=f&quot;ECB reference rate for {data[&#39;date&#39;]} (Frankfurter API)&quot;,
+                    variant=&quot;caption&quot;,
+                ),
+            ]
+        )
+    )</code></pre>
+<p><code>_code()</code> accepts only a three-letter currency code, and
+the day counts are clamped to 7–365, because the arguments come from the
+model.</p>
+<p>For "Convert 100 USD to EUR please." the model's whole tool call
+was:</p>
+<pre class="text"><code>send_a2ui_json_to_client:
+&lt;a2ui&gt;
+surface(&quot;conversion&quot;)
+root = RateCard(&quot;USD&quot;, &quot;EUR&quot;, 100)
+&lt;/a2ui&gt;</code></pre>
+<p>What reached the browser:</p>
+<pre class="text"><code>version 1.0, [&#39;createSurface&#39;], 6 components
+  https://a2ui.org/specification/v1_0/catalogs/basic/catalog.json: [&#39;Text&#39;, &#39;Text&#39;, &#39;Divider&#39;, &#39;Text&#39;, &#39;Column&#39;, &#39;Card&#39;]
+  Text: ### 100.00 USD = 89.87 EUR
+  Text: 1 USD = 0.89871 EUR
+  Text: ECB reference rate for 2026-11-11 (Frankfurter API)</code></pre>
+<p>The agent validates twice in <code>currency_agent/agent.py</code>:
+once against the catalogs the model sees, which include the macros, and
+again after expansion against the catalogs the browser implements:</p>
+<pre class="python"><code>def _parse_payload(self, processor, payload):
+    messages = super()._parse_payload(processor, payload)
+    typed = [_message_adapter.validate_python(m) for m in messages]
+    expanded = macro_expander.transform_to_transport(typed)
+    wire = [m.model_dump(by_alias=True, exclude_none=True) for m in expanded]
+    validate_payload(BASE_CATALOGS, wire)
+    return wire</code></pre>
+<hr />
+<h4 id="step-5--two-catalogs-on-one-surface">Step 5 — Two Catalogs on
+One Surface</h4>
+<p>The browser implements two catalogs: Basic 1.0 and a currency charts
+catalog with <code>LineChart</code> and <code>BarChart</code>. For "Show
+me EUR to USD for the past 6 months and the current rate" the model
+wrote two macro calls:</p>
+<pre class="text"><code>&lt;a2ui&gt;
+surface(&quot;main&quot;)
+root = Column([rateCard, historyChart])
+rateCard = RateCard(&quot;EUR&quot;, &quot;USD&quot;)
+historyChart = RateHistoryChart(&quot;EUR&quot;, &quot;USD&quot;, 180)
+&lt;/a2ui&gt;</code></pre>
+<p>The browser received one <code>createSurface</code> with each
+component naming its catalog:</p>
+<pre class="text"><code>version 1.0, [&#39;createSurface&#39;], 12 components
+  https://a2ui.org/specification/v1_0/catalogs/basic/catalog.json: [&#39;Column&#39;, &#39;Text&#39;, &#39;Text&#39;, &#39;Divider&#39;, &#39;Text&#39;, &#39;Column&#39;, &#39;Card&#39;, &#39;Text&#39;, &#39;Text&#39;, &#39;Column&#39;, &#39;Card&#39;]
+  https://a2ui.org/catalog/currency-charts/v1/catalog.json: [&#39;LineChart&#39;]</code></pre>
+<p><img
+src="https://raw.githubusercontent.com/xbill9/currency-claude-agui-a2ui1/main/docs/a2ui-1-0/img/card-and-chart.png"
+alt="A rate card for EUR to USD above a 180-day line chart" /></p>
+<p>The macros catalog appears only in what the model writes. After
+expansion, every component belongs to a catalog the browser
+implements.</p>
+<hr />
+<h4 id="step-6--the-browser-renders-the-tool-result">Step 6 — The
+Browser Renders the Tool Result</h4>
+<p>The page registers a renderer for the
+<code>send_a2ui_json_to_client</code> tool and hands its result to
+<code>@a2ui/react</code>:</p>
+<pre class="tsx"><code>useRenderTool(
+  {
+    name: &quot;send_a2ui_json_to_client&quot;,
+    render: ({ result }: any) =&gt; {
+      const messages = extractA2uiMessages(result);
+      return messages ? &lt;A2uiMessages messages={messages} /&gt; : null;
+    },
+  } as any,
+  [],
+);</code></pre>
+<p>The charts catalog id,
+<code>https://a2ui.org/catalog/currency-charts/v1/catalog.json</code>,
+appears in <code>currency_agent/custom_catalog.json</code> on the agent
+and in <code>A2UICustomCatalog.tsx</code> in the browser, with matching
+component props.</p>
+<hr />
+<h4 id="step-7--a-rate-card">Step 7 — A Rate Card</h4>
+<p>Ask: <strong>How much is 250 USD in EUR?</strong></p>
+<p><img
+src="https://raw.githubusercontent.com/xbill9/currency-claude-agui-a2ui1/main/docs/a2ui-1-0/img/rate-card.png"
+alt="Rate card: 250.00 USD = 224.68 EUR, 1 USD = 0.89871 EUR, ECB reference rate for 2026-11-11" /></p>
+<p>Everyday wording works the same way: "What's a thousand euros in
+dollars?" became <code>RateCard("EUR", "USD", 1000)</code> and
+<code>1,000.00 EUR = 1,112.70 USD</code>.</p>
+<hr />
+<h4 id="step-8--history-charts">Step 8 — History Charts</h4>
+<p>Ask: <strong>Show me the USD to JPY trend over the last 90
+days</strong></p>
+<p><img
+src="https://raw.githubusercontent.com/xbill9/currency-claude-agui-a2ui1/main/docs/a2ui-1-0/img/line-chart.png"
+alt="Line chart of USD to JPY from 2026-08-13 to 2026-11-11 with low 153.27, high 160.16 and latest 159.23" /></p>
+<p><code>RateHistoryChart("USD", "JPY", 90)</code> fetched 65 daily
+rates and drew them with <code>LineChart</code>. The low, high and
+latest line is computed in the macro.</p>
+<p>"How has the British pound done against the euro this year?" became
+<code>RateHistoryChart("GBP", "EUR", 365)</code>, 2025-11-11 to
+2026-11-11, with 256 points:</p>
+<p><img
+src="https://raw.githubusercontent.com/xbill9/currency-claude-agui-a2ui1/main/docs/a2ui-1-0/img/full-app.png"
+alt="The full app: the Currency Intellect page on the left and the chat panel on the right with a GBP to EUR chart for the last 365 days" /></p>
+<hr />
+<h4 id="step-9--comparing-currencies">Step 9 — Comparing Currencies</h4>
+<p><code>RateComparison</code> fetches today's rate for each currency
+and the history over a period, in two Frankfurter calls, and charts the
+percent change. Percent change puts every currency on one scale, yen
+included:</p>
+<pre class="python"><code>@macro
+def RateComparison(currency_from: str, currencies: list[str], days: int = 30) -&gt; Card:
+    &quot;&quot;&quot;Card comparing several currencies against one base currency: today&#39;s rate
+    for each, and a bar chart of how much each rate moved over the period, in
+    percent. The server looks up every rate, so do not pass rate figures.
+    &quot;&quot;&quot;</code></pre>
+<p>Ask: <strong>Compare the euro, pound and Swiss franc against the
+dollar in a bar chart</strong></p>
+<pre class="text"><code>send_a2ui_json_to_client:
+&lt;a2ui&gt;
+surface(&quot;main&quot;)
+root = RateComparison(&quot;USD&quot;, [&quot;EUR&quot;, &quot;GBP&quot;, &quot;CHF&quot;])
+&lt;/a2ui&gt;</code></pre>
+<p><img
+src="https://raw.githubusercontent.com/xbill9/currency-claude-agui-a2ui1/main/docs/a2ui-1-0/img/comparison.png"
+alt="1 USD against 3 currencies: today&#39;s rates for EUR, GBP and CHF above a bar chart of the change since 2026-10-12, EUR up 0.49 percent, GBP down 0.54, CHF down 0.36" /></p>
+<p><code>BarChart</code> draws values with both signs from a zero line:
+gains up, losses down in red. A new optional <code>decimals</code> prop
+sets the label precision, added in the catalog JSON, the Python builder
+and the React component together.</p>
+<p>Ask: <strong>Show a bar chart of 1 USD in EUR, GBP, JPY, CHF and
+CAD</strong></p>
+<p><img
+src="https://raw.githubusercontent.com/xbill9/currency-claude-agui-a2ui1/main/docs/a2ui-1-0/img/comparison-five.png"
+alt="1 USD against 5 currencies, with JPY at 159.23 in the rate list and a 0.40 percent change in the chart beside EUR, GBP, CHF and CAD" /></p>
+<hr />
+<h4 id="step-10--a2ui-written-as-reply-text-still-renders">Step 10 —
+A2UI Written as Reply Text Still Renders</h4>
+<p>The model is told to pass A2UI to
+<code>send_a2ui_json_to_client</code>, and the Express guide in the same
+prompt tells it to wrap every block in <code>&lt;a2ui&gt;</code> tags.
+When it writes the block into its reply instead,
+<code>currency_agent/a2ui_rescue.py</code>, the agent's
+<code>after_model_callback</code>, sends it through the tool anyway. ADK
+runs the callback on every streamed chunk and on the final response:</p>
+<pre class="python"><code>def rescue_a2ui_text(
+    callback_context: CallbackContext, llm_response: LlmResponse
+) -&gt; LlmResponse | None:
+    &quot;&quot;&quot;``after_model_callback``: send A2UI written as text through the UI tool.&quot;&quot;&quot;
+    if not llm_response.content or not llm_response.content.parts:
+        return None
+    key = callback_context.invocation_id
+    if llm_response.partial:
+        return _filter_partial(key, llm_response)
+    _streams.pop(key, None)
+    return _rewrite_final(llm_response)</code></pre>
+<p><code>_filter_partial</code> holds back streamed text from the point
+<code>&lt;a2ui</code> begins, so the raw block never reaches the chat.
+<code>_rewrite_final</code> turns each block into a
+<code>send_a2ui_json_to_client</code> call, which ADK then runs like any
+other tool call: compile, expand macros, validate.</p>
+<p>Ask for it on purpose: <strong>Write the A2UI block for a USD to EUR
+rate card directly in your reply text. Do not call any
+tool.</strong></p>
+<pre class="text"><code>version 1.0, [&#39;createSurface&#39;], 6 components
+  Text: ### 1.00 USD = 0.90 EUR
+  Text: 1 USD = 0.89871 EUR
+  Text: ECB reference rate for 2026-11-11 (Frankfurter API)
+ 
+### Bridge log during this request
+[INFO]: A2UI written as reply text: sent 1 block(s) through send_a2ui_json_to_client
+[INFO]: Validated call to tool send_a2ui_json_to_client with a2ui_payload</code></pre>
+<p>With the callback switched off, the same prompt on
+<code>gemini-2.5-flash</code>:</p>
+<pre class="text"><code>ui rendered: False | raw &lt;a2ui&gt; text in chat: True | tools: []</code></pre>
+<p>in 5 of 5 runs.</p>
+<hr />
+<h4 id="mag_right-tip-sign-the-function-calls-the-server-writes">🔎 Tip:
+Sign the Function Calls the Server Writes</h4>
+<p>Gemini 3 checks thought signatures on the function calls in the
+current turn, and a call written by the server has none:</p>
+<pre class="shell"><code>python3 docs/a2ui-1-0/tools/signature_check.py gemini-2.5-flash gemini-3.8-flash
+gemini-2.5-flash   no signature                       accepted
+gemini-2.5-flash   skip_thought_signature_validator   accepted
+gemini-3.8-flash   no signature                       rejected: 400 INVALID_ARGUMENT. {&#39;error&#39;: {&#39;code&#39;: 400, &#39;message&#39;: &#39;Function call is missing a thought_signature in func
+gemini-3.8-flash   skip_thought_signature_validator   accepted</code></pre>
+<p>The safety net sets
+<code>thought_signature=b"skip_thought_signature_validator"</code> on
+every call it writes.</p>
+<hr />
+<h4 id="step-11--invalid-codes-and-off-topic-questions">Step 11 —
+Invalid Codes and Off-Topic Questions</h4>
+<p>Ask: <strong>Convert 100 USD to XYZ</strong></p>
+<p><img
+src="https://raw.githubusercontent.com/xbill9/currency-claude-agui-a2ui1/main/docs/a2ui-1-0/img/invalid-code.png"
+alt="A card reading: Unable to convert: XYZ is not a recognized currency code. Please provide a valid 3-letter currency code (such as EUR, GBP, JPY, or CAD)." /></p>
+<p><code>RateCard("USD", "XYZ", 100)</code> fails on Frankfurter's
+answer, and the model composes an error card from Basic catalog
+components on its second call.</p>
+<p>Ask: <strong>What's the weather in Paris?</strong></p>
+<p><img
+src="https://raw.githubusercontent.com/xbill9/currency-claude-agui-a2ui1/main/docs/a2ui-1-0/img/refusal.png"
+alt="The agent replies: I cannot help with that topic. I can only assist with currency-related queries." /></p>
+<p>No tool runs; the reply is text.</p>
+<hr />
+<h4 id="step-12--every-prompt-ten-runs-two-models">Step 12 — Every
+Prompt, Ten Runs, Two Models</h4>
+<p><code>docs/a2ui-1-0/tools/render_suite.py</code> sends ten prompts
+ten times each through Next.js. A UI prompt passes when the reply
+rendered A2UI and no raw <code>&lt;a2ui</code> text reached the chat;
+the weather question passes as text with no UI; the invalid code passes
+as either.</p>
+<pre class="shell"><code>python3 docs/a2ui-1-0/tools/render_suite.py 10 gemini-3.8-flash render-suite-gemini-3.8-flash.jsonl
+# gemini-3.8-flash: 100 of 100 replies rendered clean (10 runs per prompt)
+10 of 10: pass | Compare 1 USD in EUR, GBP, JPY and CAD
+10 of 10: pass | Compare the euro, pound and Swiss franc against the dollar in a bar chart
+10 of 10: pass | Convert 100 USD to XYZ
+10 of 10: pass | How much is 250 USD in EUR?
+10 of 10: pass | Show a bar chart of 1 USD in EUR, GBP, JPY, CHF and CAD
+10 of 10: pass | Show me EUR to USD for the past 6 months and the current rate
+10 of 10: pass | Show me the USD to JPY trend over the last 90 days
+10 of 10: pass | What&#39;s a thousand euros in dollars?
+10 of 10: pass | What&#39;s the weather in Paris?
+10 of 10: pass | Write the A2UI block for a USD to EUR rate card directly in your reply text. Do not call any tool.
+# gemini-2.5-flash: 100 of 100 replies rendered clean (10 runs per prompt)</code></pre>
+<p>Every comparison reply on both models came from
+<code>RateComparison</code>, with no call to the rate tool:</p>
+<pre class="text"><code>## gemini-2.5-flash
+10 of 10: no rate-tool call, BarChart=True | Compare 1 USD in EUR, GBP, JPY and CAD
+10 of 10: no rate-tool call, BarChart=True | Compare the euro, pound and Swiss franc against the dol
+10 of 10: no rate-tool call, BarChart=True | Show a bar chart of 1 USD in EUR, GBP, JPY, CHF and CAD
+## gemini-3.8-flash
+10 of 10: no rate-tool call, BarChart=True | Compare 1 USD in EUR, GBP, JPY and CAD
+10 of 10: no rate-tool call, BarChart=True | Compare the euro, pound and Swiss franc against the dol
+10 of 10: no rate-tool call, BarChart=True | Show a bar chart of 1 USD in EUR, GBP, JPY, CHF and CAD</code></pre>
+<p>The model client makes up to five attempts on a 408, 429 or 5xx
+answer from the Gemini API, through
+<code>Gemini(retry_options=HttpRetryOptions(attempts=5, ...))</code>,
+before a user sees an error.</p>
+<hr />
+<h4 id="mag_right-tip-headings-come-from-markdown-in-10">🔎 Tip:
+Headings Come From Markdown in 1.0</h4>
+<p>Text's <code>h1</code>–<code>h5</code> variants are gone in 1.0;
+<code>caption</code> and <code>body</code> remain, and Text renders
+Markdown. The macros write <code>### 250.00 USD = 224.68 EUR</code> for
+the headline line, and <code>@a2ui/react</code> renders it with
+<code>@a2ui/markdown-it</code>.</p>
+<hr />
+<h4 id="mag_right-tip-keep-the-macro-catalog-on-the-models-side">🔎 Tip:
+Keep the Macro Catalog on the Model's Side</h4>
+<p>The macros sit in a separate catalog that exists only in the
+inference catalogs:
+<code>macro_expander.transform_catalogs(BASE_CATALOGS)</code> adds it
+for the model and the prompt. The browser's catalogs stay Basic 1.0 plus
+charts, and the second validation pass confirms every component the
+browser receives belongs to one of them.</p>
+<hr />
+<h4 id="compare-and-contrast">Compare and Contrast</h4>
+<p><img src="https://raw.githubusercontent.com/xbill9/currency-claude-agui-a2ui1/main/docs/a2ui-1-0/medium/img/devto-a2ui-1-0-currency-agent-table-5.png"
+alt="Table: Answer, Model writes, Figures from, Rendered, gemini-3.8-flash, Rendered, gemini-2.5-flash" /></p>
+<hr />
+<h4 id="so-which-one">So, Which One?</h4>
+<p>For anything the agent shows often, write a macro. The model's output
+shrinks to one line with the codes and an amount, the figures come from
+the source on the server, and both validation passes run on what the
+browser receives. Rate cards, history charts and comparisons all take
+this path here.</p>
+<p>Behind the macros, keep the safety net. It sends A2UI the model
+writes as reply text through the same tool, so the user sees a card
+instead of a code block, on both model generations.</p>
+<p>For the protocol itself, 1.0 sends a surface in one message, mixes
+catalogs per component, and opens function calls in both directions,
+with permissions and composition rules declared in the catalog.</p>
+<hr />
+<h4 id="summary">Summary</h4>
+<p>The goal of this article was to move a currency agent from A2UI 0.9
+to A2UI 1.0 and show what changes for the model, the server and the
+browser. The key to the solution was server-side macros on the 1.0
+protocol, with every UI answer going through one server path: the model
+names a component and its arguments, and the server fetches the data,
+builds the components, validates them and sends the surface in one
+message. The results were:</p>
+<ul>
+<li>🟢 For a conversion the model wrote one line,
+<code>root = RateCard("USD", "EUR", 100)</code>, and the browser
+received six Basic 1.0 components with the live rate in one
+<code>createSurface</code></li>
+<li>🟢 Ten prompts, ten runs each: 100 of 100 replies rendered clean on
+<code>gemini-3.8-flash</code> and 100 of 100 on
+<code>gemini-2.5-flash</code></li>
+<li>🟢 Comparisons came from <code>RateComparison</code> in 60 of 60
+runs across both models, with no rate-tool call, charted as percent
+change from a zero line</li>
+<li>🟢 A2UI written as reply text rendered as UI through the safety net;
+with the net off it showed as raw text in 5 of 5 runs</li>
+<li>🟢 One surface mixed two catalogs, each component naming its own
+<code>catalogId</code></li>
+<li>🟢 The same Express block compiles to one message on 1.0 and three
+on 0.9</li>
+<li>🟢 1.0 adds functions in both directions, function permissions,
+composition rules, graded validation, <code>userMessage</code> on
+actions, <code>live</code> and <code>hidden</code>, and
+<code>@index</code></li>
+<li>⚠️ Function calls the server writes need
+<code>skip_thought_signature_validator</code> on Gemini 3;
+<code>gemini-3.8-flash</code> rejects them with a 400 otherwise</li>
+<li>⚠️ 1.0 drops <code>theme</code> from <code>createSurface</code> and
+the h1–h5 Text variants</li>
+</ul>
+<p>Scope: one laptop running all four services,
+<code>gemini-3.8-flash</code> and <code>gemini-2.5-flash</code> at their
+default settings, ECB reference rates from the Frankfurter API, measured
+on 2026-11-11 with ten runs per prompt per model. Protocol details come
+from the 0.9 and 1.0 schemas in <code>a2ui-core</code> 0.6.0.</p>
+<p>The strategy for moving a generative UI agent to A2UI 1.0 with
+server-side macros was validated with an incremental step by step
+approach.</p>
+<hr />
+<h4 id="references">References</h4>
+<ul>
+<li>The repository: <a
+href="https://github.com/xbill9/currency-claude-agui-a2ui1">https://github.com/xbill9/currency-claude-agui-a2ui1</a></li>
+<li>Evidence for every figure here: <a
+href="https://github.com/xbill9/currency-claude-agui-a2ui1/tree/main/docs/a2ui-1-0/evidence">https://github.com/xbill9/currency-claude-agui-a2ui1/tree/main/docs/a2ui-1-0/evidence</a></li>
+<li>Demo, screenshot and test scripts: <a
+href="https://github.com/xbill9/currency-claude-agui-a2ui1/tree/main/docs/a2ui-1-0/tools">https://github.com/xbill9/currency-claude-agui-a2ui1/tree/main/docs/a2ui-1-0/tools</a></li>
+<li>A2UI v1.0 specification: <a
+href="https://a2ui.org/specification/v1.0-a2ui/">https://a2ui.org/specification/v1.0-a2ui/</a></li>
+<li>A2UI: <a href="https://a2ui.org">https://a2ui.org</a></li>
+<li>AG-UI: <a
+href="https://docs.ag-ui.com">https://docs.ag-ui.com</a></li>
+<li>CopilotKit: <a
+href="https://github.com/CopilotKit/CopilotKit">https://github.com/CopilotKit/CopilotKit</a></li>
+<li>Google Agent Development Kit: <a
+href="https://github.com/google/adk-python">https://github.com/google/adk-python</a></li>
+<li>Model Context Protocol: <a
+href="https://modelcontextprotocol.io">https://modelcontextprotocol.io</a></li>
+<li>Frankfurter API: <a
+href="https://www.frankfurter.dev">https://www.frankfurter.dev</a></li>
+<li>The upstream Currency Agent (A2A + ADK + MCP): <a
+href="https://github.com/jackwotherspoon/currency-agent">https://github.com/jackwotherspoon/currency-agent</a></li>
+</ul>
+</body>
+</html>
