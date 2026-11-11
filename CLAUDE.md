@@ -45,4 +45,4 @@ The lint baseline already fails (77 `ruff check` errors and 2 unformatted files 
 
 ## Git
 
-Commit straight to `master` and push. No branches or PRs.
+Commit straight to the default branch and push, with no branches or PRs. The local branch is `master`, but GitHub's default is `main`, so push with `git push origin HEAD:main`.
