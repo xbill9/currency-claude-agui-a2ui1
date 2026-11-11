@@ -1,0 +1,3 @@
+# 6 runs of: Compare the euro, pound and Swiss franc against the dollar in a bar chart (gemini-2.5-flash), counted by script
+4 of 6: rendered BarChart
+2 of 6: Express block as plain text, no UI

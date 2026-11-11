@@ -11,6 +11,8 @@
 
 A currency conversion agent that answers with generated UI. Ask "How much is 250 USD in EUR?" and the agent replies with a rate card; ask for a trend and it draws a line chart. The agent runs on Google's [Agent Development Kit](https://github.com/google/adk-python) with Gemini, gets exchange rates from an [MCP](https://modelcontextprotocol.io) tool server, and describes its UI in [A2UI 1.0](https://a2ui.org). A Next.js + [CopilotKit](https://www.copilotkit.ai) front end renders it over [AG-UI](https://docs.ag-ui.com), and the same agent is also served over [A2A](https://github.com/a2aproject/A2A).
 
+Write-up with screenshots and the changes from A2UI 0.9: [docs/a2ui-1-0](docs/a2ui-1-0/devto-a2ui-1-0-currency-agent.md).
+
 Builds on the [Currency Agent codelab](https://codelabs.developers.google.com/codelabs/currency-agent) (A2A + ADK + MCP).
 
 ---

@@ -1,0 +1,25 @@
+# Versions read on 2026-11-11 from the machine that ran the demos
+
+## Python packages (active python3)
+Python 3.14.7
+Name: google-adk	Version: 2.13.0
+Name: a2a-sdk	Version: 0.3.26
+Name: a2ui-agent-sdk	Version: 0.11.0
+Name: a2ui-adk	Version: 0.3.0
+Name: a2ui-core	Version: 0.6.0
+Name: ag_ui_adk	Version: 0.6.5
+Name: fastmcp	Version: 4.1.8
+
+## Node packages (frontend-react/node_modules)
+v24.21.0
+next 16.1.1
+react 19.2.7
+@copilotkit/react-core 1.56.4
+@copilotkit/runtime 1.56.4
+@a2ui/react 0.15.0
+@a2ui/web_core 0.15.0
+@ag-ui/client 0.0.52
+
+## Model
+108:    model=os.getenv("GENAI_MODEL", "gemini-2.5-flash"),
+GENAI_MODEL unset in the demo environment, so the default applied

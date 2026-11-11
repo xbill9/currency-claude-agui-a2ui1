@@ -1,0 +1,60 @@
+# Pre-1.0 (commit d181ddb) vs A2UI 1.0 (commit 09d5f21 and later), read from git on 2026-11-11
+
+## d181ddb currency_agent/agent.py: A2UI setup
+27:from a2ui.schema.manager import A2uiSchemaManager
+28:from a2ui.basic_catalog.provider import BasicCatalog
+31:    A2uiPartConverter,
+46:schema_manager = A2uiSchemaManager(
+47:    version="0.9",
+49:        BasicCatalog.get_config("0.9"),
+63:        "Your sole purpose is to use the 'get_exchange_rate' tool to answer questions about currency exchange rates. "
+69:    ui_description="Use Card and Text components for displaying rates. Use Table components for tabular data. Use BarChart components or LineChart components when presenting exchange rate trends or histories over time.",
+72:    allowed_components=["Card", "Text", "Table", "BarChart", "LineChart"],
+103:        gen_ai_part_converter=A2uiPartConverter(
+104:            selected_catalog, bypass_tool_check=True
+
+## d181ddb frontend-react/src/app/page.tsx: how the UI was read
+11:import { useA2UI, A2UIRenderer } from "@copilotkit/a2ui-renderer";
+15:function normalizeA2UIJson(parsed: any) {
+56:      norm.props.title = norm.title || "💵 Conversion Result";
+62:    version: parsed.version || "0.9",
+84:function parseA2UIContent(text: string) {
+90:  const xmlStartIndex = text.indexOf("<a2ui-json>");
+93:    const xmlMatch = text.match(/<a2ui-json>([\s\S]*?)<\/a2ui-json>/);
+98:    // Check if there is a raw JSON block starting with { and containing "version": "v0.9"
+99:    const jsonStartIndex = text.search(/\{[\s\S]*?"version"\s*:\s*"v0.9"/);
+102:      const jsonMatch = text.match(/(\{[\s\S]*?"version"\s*:\s*"v0.9"[\s\S]*?\})/);
+137:          version: "0.9",
+
+## d181ddb route.ts: CopilotKit A2UI middleware
+17:  a2ui: {
+18:    a2uiToolNames: ["render_a2ui", "send_a2ui_json_to_client"],
+
+## d181ddb validate_agui.py: where the checks looked for the UI
+184:                    elif ev_type == "TEXT_MESSAGE_CONTENT":
+208:            if "<a2ui-json>" not in final_text or "</a2ui-json>" not in final_text:
+210:                    "Missing A2UI XML wrapper tags (<a2ui-json>) in response",
+217:                start_tag = "<a2ui-json>"
+
+## page.tsx line counts
+d181ddb: 309
+09d5f21: 150
+
+## Dependency changes in 09d5f21
+-  "a2ui-agent-sdk>=0.2.1",
++  "a2ui-agent-sdk>=0.11.0",
++  "a2ui-adk[a2a]>=0.3.0",
++  "a2ui-core>=0.6.0",
++    "@a2ui/markdown-it": "^0.2.2",
++    "@a2ui/react": "^0.15.0",
++    "@a2ui/web_core": "^0.15.0",
+-    "a2ui-agent-sdk>=0.2.1",
++    "a2ui-agent-sdk>=0.11.0",
++    "a2ui-adk[a2a]>=0.3.0",
++    "a2ui-core>=0.6.0",
+
+## Custom catalog id and protocol version
+3:  "catalogId": "https://a2ui.org/catalog/currency-charts",
+--- now:
+3:  "catalogId": "https://a2ui.org/catalog/currency-charts/v1/catalog.json",
+4:  "protocolVersion": "1.0",

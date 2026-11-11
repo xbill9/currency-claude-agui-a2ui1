@@ -1,0 +1,37 @@
+# Lint and tests, 2026-11-11T20:29:42Z, services running from the working tree
+
+$ ruff check .
+All checks passed!
+$ ruff format --check .
+35 files already formatted   (after formatting docs/a2ui-1-0/tools/shoot.py)
+
+$ python3 -m pytest -q mcp-server/test_server.py
+1 passed in 1.51s
+$ PYTHONPATH=frontend python3 -m pytest -q frontend/tests
+13 passed in 1.95s
+
+$ python3 frontend-react/scripts/validate_agui.py --target nextjs
+✓ Next.js server is reachable at http://localhost:3000/api/copilotkit (HTTP 405)
+✓ SSE Stream completed with valid flow transitions.
+✓ A2UI 1.0 createSurface received with 6 components.
+  Text components: ['### 100.00 USD = 89.87 EUR', '1 USD = 0.89871 EUR', 'ECB reference rate for 2026-11-11 (Frankfurter API)']
+✓ Agent correctly refused to answer off-topic prompt (Matched: ['currency', 'conversion', 'exchange rate'])
+
+$ python3 frontend-react/scripts/validate_agui.py --target direct
+✓ Endpoint reachable at http://localhost:8008/capabilities (HTTP 200)
+✓ Capabilities endpoint successfully queried.
+✓ SSE Stream completed with valid flow transitions.
+✓ A2UI 1.0 createSurface received with 6 components.
+  Text components: ['### 100.00 USD = 89.87 EUR', '1 USD = 0.89871 EUR', 'ECB reference rate for 2026-11-11 (Frankfurter API)']
+✓ Agent correctly refused to answer off-topic prompt (Matched: ['cannot help', 'currency', 'conversion', 'exchange rate'])
+✓ Thread state successfully loaded (Thread exists: True)
+✓   Retrieved 3 messages from thread history.
+
+$ python3 frontend-react/scripts/test_react_e2e.py
+✓ React Agent on port 8008 is healthy.
+✓ React UI Server on port 3000 is healthy and reachable.
+✓ Connected to SSE stream. Parsing events...
+✓ SSE Stream completed successfully.
+✓ The agent successfully invoked a tool during execution.
+i A2UI text components: ['### 100.00 USD = 89.87 EUR', '1 USD = 0.89871 EUR', 'ECB reference rate for 2026-11-11 (Frankfurter API)']
+✓ Agent streamed an A2UI 1.0 surface with 6 components.

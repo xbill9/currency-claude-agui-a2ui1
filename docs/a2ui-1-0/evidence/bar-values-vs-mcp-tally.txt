@@ -1,0 +1,4 @@
+3 of 5: bar chart, values identical | Compare the euro, pound and Swiss franc against the dollar in a bar chart
+2 of 5: no bar chart | Compare the euro, pound and Swiss franc against the dollar in a bar chart
+4 of 5: bar chart, values identical | Show a bar chart of 1 USD in EUR, GBP, JPY, CHF and CAD
+1 of 5: no bar chart | Show a bar chart of 1 USD in EUR, GBP, JPY, CHF and CAD

@@ -1,0 +1,14 @@
+data: {"type":"RUN_STARTED","threadId":"chk-thread-1","runId":"chk-1","input":{"threadId":"chk-thread-1","runId":"chk-1","state":{},"messages":[{"id":"m1","role":"user","content":"Convert 100 USD to EUR please."}],"tools":[],"context":[]}}
+
+data: {"type":"TOOL_CALL_START","toolCallId":"adk-d64a8c17-39b1-4e8d-9dd8-77eb92289381","toolCallName":"send_a2ui_json_to_client"}
+
+data: {"type":"TOOL_CALL_ARGS","toolCallId":"adk-d64a8c17-39b1-4e8d-9dd8-77eb92289381","delta":"{\"a2ui_payload\":\"<a2ui>\\nroot = RateCard(\\\"USD\\\", \\\"EUR\\\", 100, catalogId=\\\"https://a2ui.org/catalogs/macros\\\")\\n</a2ui>\"}"}
+
+data: {"type":"TOOL_CALL_END","toolCallId":"adk-d64a8c17-39b1-4e8d-9dd8-77eb92289381"}
+
+data: {"type":"TOOL_CALL_RESULT","messageId":"a5b9f0ca-9bda-4c6f-b287-32a137bdb810","toolCallId":"adk-d64a8c17-39b1-4e8d-9dd8-77eb92289381","content":"{\"validated_a2ui_json\": [{\"version\": \"1.0\", \"createSurface\": {\"surfaceId\": \"main\", \"components\": [{\"component\": \"Text\", \"id\": \"root__text_1\", \"text\": \"### 100.00 USD = 89.87 EUR\", \"variant\": \"body\", \"catalogId\": \"https://a2ui.org/specification/v1_0/catalogs/basic/catalog.json\"}, {\"component\": \"Text\", \"id\": \"root__text_2\", \"text\": \"1 USD = 0.89871 EUR\", \"variant\": \"body\", \"catalogId\": \"https://a2ui.org/specification/v1_0/catalogs/basic/catalog.json\"}, {\"component\": \"Divider\", \"id\": \"root__divider_1\", \"axis\": \"horizontal\", \"catalogId\": \"https://a2ui.org/specification/v1_0/catalogs/basic/catalog.json\"}, {\"component\": \"Text\", \"id\": \"root__text_3\", \"text\": \"ECB reference rate for 2026-11-11 (Frankfurter API)\", \"variant\": \"caption\", \"catalogId\": \"https://a2ui.org/specification/v1_0/catalogs/basic/catalog.json\"}, {\"component\": \"Column\", \"id\": \"root__column_1\", \"children\": [\"root__text_1\", \"root__text_2\", \"root__divider_1\", \"root__text_3\"], \"justify\": \"start\", \"align\": \"stretch\", \"catalogId\": \"https://a2ui.org/specification/v1_0/catalogs/basic/catalog.json\"}, {\"component\": \"Card\", \"id\": \"root\", \"child\": \"root__column_1\", \"catalogId\": \"https://a2ui.org/specification/v1_0/catalogs/basic/catalog.json\"}]}}]}"}
+
+data: {"type":"STATE_SNAPSHOT","snapshot":{"_ag_ui_thread_id":"chk-thread-1","_ag_ui_app_name":"currency_agent","_ag_ui_user_id":"demo_user"}}
+
+data: {"type":"RUN_FINISHED","threadId":"chk-thread-1","runId":"chk-1"}
+

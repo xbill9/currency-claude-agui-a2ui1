@@ -1,0 +1,47 @@
+# Bar chart values vs MCP results, 5 runs per prompt, 2026-11-11T20:30:59Z, gemini-2.5-flash
+## Compare the euro, pound and Swiss franc against the dollar in a bar chart
+   MCP rates : {'USD->EUR': 0.89871, 'USD->GBP': 0.75149, 'USD->CHF': 0.82987}
+   bar values: None
+   identical : False
+## Compare the euro, pound and Swiss franc against the dollar in a bar chart
+   MCP rates : {'EUR->USD': 1.1127, 'GBP->USD': 1.3307, 'CHF->USD': 1.205}
+   bar values: None
+   identical : False
+## Compare the euro, pound and Swiss franc against the dollar in a bar chart
+   MCP rates : {'EUR->USD': 1.1127, 'GBP->USD': 1.3307, 'CHF->USD': 1.205}
+   bar values: {'EUR': 1.1127, 'GBP': 1.3307, 'CHF': 1.205}
+   identical : True
+## Compare the euro, pound and Swiss franc against the dollar in a bar chart
+   MCP rates : {'USD->EUR': 0.89871, 'USD->GBP': 0.75149, 'USD->CHF': 0.82987}
+   bar values: {'EUR': 0.89871, 'GBP': 0.75149, 'CHF': 0.82987}
+   identical : True
+## Compare the euro, pound and Swiss franc against the dollar in a bar chart
+   MCP rates : {'EUR->USD': 1.1127, 'GBP->USD': 1.3307, 'CHF->USD': 1.205}
+   bar values: {'EUR': 1.1127, 'GBP': 1.3307, 'CHF': 1.205}
+   identical : True
+## Show a bar chart of 1 USD in EUR, GBP, JPY, CHF and CAD
+   MCP rates : {'USD->EUR': 0.89871, 'USD->GBP': 0.75149, 'USD->JPY': 159.23, 'USD->CHF': 0.82987, 'USD->CAD': 1.4235}
+   bar values: {'EUR': 0.89871, 'GBP': 0.75149, 'JPY': 159.23, 'CHF': 0.82987, 'CAD': 1.4235}
+   identical : True
+## Show a bar chart of 1 USD in EUR, GBP, JPY, CHF and CAD
+   MCP rates : {'USD->EUR': 0.89871, 'USD->GBP': 0.75149, 'USD->JPY': 159.23, 'USD->CHF': 0.82987, 'USD->CAD': 1.4235}
+   bar values: None
+   identical : False
+## Show a bar chart of 1 USD in EUR, GBP, JPY, CHF and CAD
+   MCP rates : {'USD->EUR': 0.89871, 'USD->GBP': 0.75149, 'USD->JPY': 159.23, 'USD->CHF': 0.82987, 'USD->CAD': 1.4235}
+   bar values: {'EUR': 0.89871, 'GBP': 0.75149, 'JPY': 159.23, 'CHF': 0.82987, 'CAD': 1.4235}
+   identical : True
+## Show a bar chart of 1 USD in EUR, GBP, JPY, CHF and CAD
+   MCP rates : {'USD->EUR': 0.89871, 'USD->GBP': 0.75149, 'USD->JPY': 159.23, 'USD->CHF': 0.82987, 'USD->CAD': 1.4235}
+   bar values: {'EUR': 0.89871, 'GBP': 0.75149, 'JPY': 159.23, 'CHF': 0.82987, 'CAD': 1.4235}
+   identical : True
+## Show a bar chart of 1 USD in EUR, GBP, JPY, CHF and CAD
+   MCP rates : {'USD->EUR': 0.89871, 'USD->GBP': 0.75149, 'USD->JPY': 159.23, 'USD->CHF': 0.82987, 'USD->CAD': 1.4235}
+   bar values: {'EUR': 0.89871, 'GBP': 0.75149, 'JPY': 159.23, 'CHF': 0.82987, 'CAD': 1.4235}
+   identical : True
+
+# Tally
+3 x bar chart, values identical | Compare the euro, pound and Swiss franc against the dollar in a bar chart
+2 x no bar chart | Compare the euro, pound and Swiss franc against the dollar in a bar chart
+4 x bar chart, values identical | Show a bar chart of 1 USD in EUR, GBP, JPY, CHF and CAD
+1 x no bar chart | Show a bar chart of 1 USD in EUR, GBP, JPY, CHF and CAD

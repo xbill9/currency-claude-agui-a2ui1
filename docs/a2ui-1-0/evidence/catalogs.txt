@@ -1,0 +1,5 @@
+# Catalogs the A2UI 1.0 renderer implements (BASE_CATALOGS), read from currency_agent.agent
+BasicCatalog https://a2ui.org/specification/v1_0/catalogs/basic/catalog.json 18 components: AudioPlayer, Button, Card, CheckBox, ChoicePicker, Column, DateTimeInput, Divider, Icon, Image, List, Modal, Row, Slider, Tabs, Text, TextField, Video
+Catalog https://a2ui.org/catalog/currency-charts/v1/catalog.json 2 components: BarChart, LineChart
+Table in Basic 1.0: False
+Macros: RateCard, RateHistoryChart

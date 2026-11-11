@@ -1,0 +1,51 @@
+== bar-chart: Compare the euro, pound and Swiss franc against the dollar in a bar chart
+Compare the euro, pound and Swiss franc against the dollar in a bar chart
+Exchange Rate Details
+
+Date: 2026-11-11
+
+💵
+FROM
+EUR
+➔
+TO
+USD
+1.1127
+1 EUR = 1.1127 USD
+Exchange Rate Details
+
+Date: 2026-11-11
+
+💵
+FROM
+GBP
+➔
+TO
+USD
+1.3307
+1 GBP = 1.3307 USD
+Exchange Rate Details
+
+Date: 2026-11-11
+
+💵
+FROM
+CHF
+➔
+TO
+USD
+1.2050
+1 CHF = 1.2050 USD
+Exchange Rates vs. USD
+1.1127
+EUR
+1.3307
+GBP
+1.2050
+CHF
+Convert USD to EUR
+Compare USD to GBP
+Convert CAD to USD
+USD/JPY trend
+AI can make mistakes. Please verify important information.
+

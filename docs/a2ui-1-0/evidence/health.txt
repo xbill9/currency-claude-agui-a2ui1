@@ -1,0 +1,4 @@
+$ curl -s http://127.0.0.1:10000/health
+{"status":"ok"}
+$ curl -s http://127.0.0.1:8008/health
+{"status":"ok"}

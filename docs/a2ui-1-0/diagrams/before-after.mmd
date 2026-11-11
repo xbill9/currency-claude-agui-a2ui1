@@ -1,0 +1,19 @@
+flowchart TB
+    subgraph OLD["Before: A2UI 0.9"]
+        direction LR
+        o1["Model calls<br/>get_exchange_rate"] --> o2["Model writes the full<br/>component JSON,<br/>rate figures included"]
+        o2 --> o3["Reply text carries<br/>&lt;a2ui-json&gt; blocks"]
+        o3 --> o4["Browser cuts the blocks out,<br/>repairs the shape,<br/>CopilotKit a2ui-renderer"]
+    end
+    subgraph NEW["Now: A2UI 1.0"]
+        direction LR
+        n1["Model writes one line<br/>RateCard(USD, EUR, 250)"] --> n2["Compile Express +<br/>validate against<br/>inference catalogs"]
+        n2 --> n3["MacroExpander fetches<br/>the rate on the server,<br/>builds Card + Text"]
+        n3 --> n4["Validate against<br/>Basic 1.0 + charts"]
+        n4 --> n5["Tool result<br/>validated_a2ui_json<br/>@a2ui/react renders"]
+    end
+    OLD ~~~ NEW
+    classDef old fill:#fef2f2,stroke:#ef4444,color:#7f1d1d
+    classDef new fill:#ecfdf5,stroke:#10b981,color:#064e3b
+    class o1,o2,o3,o4 old
+    class n1,n2,n3,n4,n5 new

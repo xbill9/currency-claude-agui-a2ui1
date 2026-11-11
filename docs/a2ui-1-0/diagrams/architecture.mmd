@@ -1,0 +1,13 @@
+flowchart LR
+    B["Browser<br/>Next.js 16 + CopilotKit<br/>@a2ui/react 0.15<br/>:3000"] -- "AG-UI<br/>/api/copilotkit" --> G["AG-UI bridge<br/>ag-ui-adk<br/>:8008"]
+    G --> AG["ADK agent<br/>Gemini + A2UI 1.0<br/>Express + macros"]
+    C["A2A clients<br/>test_client.py<br/>legacy frontend/"] -- "A2A" --> S["A2A server<br/>:10000"] --> AG
+    AG -- "MCP over HTTP<br/>/mcp" --> M["MCP server<br/>get_exchange_rate<br/>:8080"]
+    AG -- "RateCard<br/>RateHistoryChart" --> F[("Frankfurter API<br/>ECB rates")]
+    M --> F
+    classDef ui fill:#ecfdf5,stroke:#10b981,color:#064e3b
+    classDef agent fill:#eff6ff,stroke:#3b82f6,color:#1e3a8a
+    classDef ext fill:#f8fafc,stroke:#64748b,color:#0f172a
+    class B,C ui
+    class G,S,AG agent
+    class M,F ext
