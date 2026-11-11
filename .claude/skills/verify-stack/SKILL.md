@@ -30,6 +30,6 @@ Verify the stack end to end. Never use `uv run`, `uv sync`, the uv-based `make` 
 
 6. Scan `agent.log` and `react-agent.log` for tracebacks, A2UI validation errors, or `MacroExpander` errors even if tests passed.
 
-7. **Always stop:** `make stop`. Then `git status --short`: if `uv.lock` changed or `.venv/` appeared, revert/remove it and say so.
+7. **Always stop:** `make stop`. It misses the AG-UI bridge and Next.js when they were started with relative paths as above, so also stop whatever still listens on those ports: `for p in 8008 3000; do lsof -t -i :$p -sTCP:LISTEN | xargs -r kill; done`. Don't use `pkill -f 'next dev'`, because it matches and kills the shell running it. Confirm all four ports are closed. Then `git status --short`: if `uv.lock` changed or `.venv/` appeared, revert/remove it and say so.
 
 Report each step as pass/fail with the exact failing output quoted. Don't claim a pass for a step that didn't run.
