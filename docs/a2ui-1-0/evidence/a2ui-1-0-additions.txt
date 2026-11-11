@@ -1,0 +1,22 @@
+# A2UI 1.0 additions, grep of the installed a2ui-core 0.6.0 (2026-11-11)
+## core/basic_catalog/v0_9/components.py
+408:    validation_regexp: str | None = Field(
+## core/basic_catalog/v1_0/components.py
+197:    poster_url: DynamicString | None = Field(
+405:    placeholder: DynamicString | None = Field(
+481:    steps: Annotated[int, Field(ge=1)] | None = Field(
+## core/schema/v1_0/renderer_to_agent.py
+41:    user_message: str | None = Field(
+121:    code: Literal["VALIDATION_FAILED", "UNALLOWED_PARENT", "UNALLOWED_CHILD"] = Field(
+180:RendererToAgentMessage = (
+## core/schema/v1_0/common_types.py
+148:    live: Literal["off", "polite", "assertive"] | None = Field(
+157:    hidden: DynamicBoolean | None = Field(
+297:    call: Literal["@index"] = Field(..., alias="@call")
+## core/schema/v1_0/catalog_definition.py
+56:    allowed_callers: Literal["rendererOnly", "agentOnly", "rendererOrAgent"] | None = (
+66:    requires_user_activation: bool | None = Field(
+89:    allowed_parents: list[str] | None = Field(
+102:    allowed_children: list[str] | None = Field(
+134:    severity: Literal["error", "warning", "info"] | None = Field(
+204:    instructions: str | None = Field(

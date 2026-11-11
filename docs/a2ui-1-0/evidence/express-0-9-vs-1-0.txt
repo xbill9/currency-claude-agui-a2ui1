@@ -1,0 +1,177 @@
+## Express source
+surface("main")
+$/user/name = "Ada"
+title = Text(formatString("Hello ${/user/name}"))
+btn = Button(Text("Save"), action=Event("save", {name: $/user/name}, userMessage="Saving"))
+root = Column([title, TextField("Name", $/user/name, checks=[?required("Name is required")]), btn])
+
+## A2UI 1.0: 1 message(s): ['createSurface']
+[
+ {
+  "version": "1.0",
+  "createSurface": {
+   "surfaceId": "main",
+   "catalogId": "https://a2ui.org/specification/v1_0/catalogs/basic/catalog.json",
+   "components": [
+    {
+     "id": "title",
+     "component": "Text",
+     "text": {
+      "@call": "formatString",
+      "args": {
+       "value": "Hello ${/user/name}"
+      }
+     }
+    },
+    {
+     "id": "btn",
+     "component": "Button",
+     "child": "btn_child",
+     "action": {
+      "event": {
+       "name": "save",
+       "userMessage": "Saving",
+       "context": {
+        "name": {
+         "@path": "/user/name"
+        }
+       }
+      }
+     }
+    },
+    {
+     "id": "btn_child",
+     "component": "Text",
+     "text": "Save"
+    },
+    {
+     "id": "root",
+     "component": "Column",
+     "children": [
+      "title",
+      "root_children_1",
+      "btn"
+     ]
+    },
+    {
+     "id": "root_children_1",
+     "component": "TextField",
+     "label": "Name",
+     "value": {
+      "@path": "/user/name"
+     },
+     "checks": [
+      {
+       "condition": {
+        "@call": "required",
+        "args": {
+         "value": {
+          "@path": "/user/name"
+         }
+        }
+       },
+       "message": "Name is required"
+      }
+     ]
+    }
+   ],
+   "dataModel": {
+    "user": {
+     "name": "Ada"
+    }
+   }
+  }
+ }
+]
+## A2UI 0.9 (userMessage removed): 3 message(s): ['createSurface', 'updateComponents', 'updateDataModel']
+[
+ {
+  "version": "v0.9",
+  "createSurface": {
+   "surfaceId": "main",
+   "catalogId": "https://a2ui.org/specification/v0_9/catalogs/basic/catalog.json"
+  }
+ },
+ {
+  "version": "v0.9",
+  "updateComponents": {
+   "surfaceId": "main",
+   "components": [
+    {
+     "id": "title",
+     "component": "Text",
+     "text": {
+      "call": "formatString",
+      "args": {
+       "value": "Hello ${/user/name}"
+      }
+     }
+    },
+    {
+     "id": "btn",
+     "component": "Button",
+     "child": "btn_child",
+     "action": {
+      "event": {
+       "name": "save",
+       "context": {
+        "name": {
+         "path": "/user/name"
+        }
+       }
+      }
+     }
+    },
+    {
+     "id": "btn_child",
+     "component": "Text",
+     "text": "Save"
+    },
+    {
+     "id": "root",
+     "component": "Column",
+     "children": [
+      "title",
+      "root_children_1",
+      "btn"
+     ]
+    },
+    {
+     "id": "root_children_1",
+     "component": "TextField",
+     "label": "Name",
+     "value": {
+      "path": "/user/name"
+     },
+     "checks": [
+      {
+       "condition": {
+        "call": "required",
+        "args": {
+         "value": {
+          "path": "/user/name"
+         }
+        }
+       },
+       "message": "Name is required"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "version": "v0.9",
+  "updateDataModel": {
+   "surfaceId": "main",
+   "path": "/",
+   "value": {
+    "user": {
+     "name": "Ada"
+    }
+   }
+  }
+ }
+]
+## userMessage on 0.9
+ExpressValidationError: Event userMessage requires protocol v1.0 or later; the target version v0.9 has no userMessage field.

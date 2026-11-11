@@ -1,0 +1,15 @@
+# Show me EUR to USD for the past 6 months and the current rate (gemini-2.5-flash)
+## What the model wrote
+
+<a2ui>
+root = Column([
+  RateHistoryChart("EUR", "USD", days=180, catalogId="https://a2ui.org/catalogs/macros"),
+  RateCard("EUR", "USD", catalogId="https://a2ui.org/catalogs/macros")
+])
+</a2ui>
+
+## What reached the browser
+version 1.0 | messages: ['createSurface']
+  https://a2ui.org/specification/v1_0/catalogs/basic/catalog.json: ['Column', 'Text', 'Text', 'Column', 'Card', 'Text', 'Text', 'Divider', 'Text', 'Column', 'Card']
+  https://a2ui.org/catalog/currency-charts/v1/catalog.json: ['LineChart']
+  surface default catalogId: None

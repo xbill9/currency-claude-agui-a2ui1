@@ -1,0 +1,24 @@
+# A2UI 0.9 vs 1.0, read from the installed a2ui-core 0.6.0 / a2ui-agent-sdk 0.11.0
+Basic 0.9: 18 components: AudioPlayer, Button, Card, CheckBox, ChoicePicker, Column, DateTimeInput, Divider, Icon, Image, List, Modal, Row, Slider, Tabs, Text, TextField, Video; Table present: False
+Basic 0.9 functions: 14
+Basic 1.0: 18 components: AudioPlayer, Button, Card, CheckBox, ChoicePicker, Column, DateTimeInput, Divider, Icon, Image, List, Modal, Row, Slider, Tabs, Text, TextField, Video; Table present: False
+Basic 1.0 functions: 15 (adds @index; none removed)
+Text variant 0.9: core/basic_catalog/v0_9/components.py:88: variant: Literal["h1", "h2", "h3", "h4", "h5", "caption", "body"] | None = Field(
+Text variant 1.0: core/basic_catalog/v1_0/components.py:89: variant: Literal["caption", "body"] | None = Field(
+0.9 agent->renderer: ServerToClientMessage = CreateSurfaceMessage     | UpdateComponentsMessage     | UpdateDataModelMessage     | DeleteSurfaceMessage
+1.0 agent->renderer: AgentToRendererMessage = CreateSurfaceMessage     | UpdateComponentsMessage     | UpdateDataModelMessage     | DeleteSurfaceMessage     | CallRendererFunctionMessage     | AgentFunctionResponseMessage
+0.9 renderer->agent:  A2uiClientActionMessage | A2uiRendererErrorMessage
+1.0 renderer->agent: A2uiRendererActionMessage     | CallAgentFunctionMessage     | RendererFunctionResponseMessage     | A2uiRendererErrorMessage
+0.9 createSurface theme field: core/schema/v0_9/server_to_client.py:50: theme: (
+1.0 createSurface fields include components/dataModel: True True | theme: False
+catalog_definition has allowedParents: True
+catalog_definition has allowedChildren: True
+catalog_definition has allowedCallers: True
+catalog_definition has requiresUserActivation: True
+catalog_definition has instructions: True
+1.0 common_types mentions "@path": True
+1.0 common_types mentions "@call": True
+1.0 common_types mentions "@index": True
+1.0 common_types mentions assertive: True
+1.0 common_types mentions polite: True
+1.0 common_types mentions extensions: True
