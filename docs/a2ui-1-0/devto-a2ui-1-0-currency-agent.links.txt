@@ -1,8 +1,8 @@
 # Destination URLs for the LinkedIn, Slack and Google Chat posts. PENDING fails the
 # run on purpose: a post whose links do not resolve is worse than no post.
 devto-gde  = https://dev.to/gde/what-changes-with-the-a2ui-10-release-31eo
-medium     = PENDING
+medium     = https://xbill999.medium.com/what-changes-with-the-a2ui-1-0-release-694be0ac3140
 builder    = PENDING
-substack   = SKIP
+substack   = https://xbill9.substack.com/p/what-changes-with-the-a2ui-10-release
 devto-aws  = SKIP
 repo       = https://github.com/xbill9/currency-claude-agui-a2ui1
