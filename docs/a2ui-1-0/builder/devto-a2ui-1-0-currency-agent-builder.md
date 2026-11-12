@@ -1,4 +1,4 @@
-# A2UI 1.0 vs 0.9: What Changed, and Why It Is Better
+# What Changes With the A2UI 1.0 Release
 
 This article walks through what changed between A2UI 0.9 and A2UI 1.0, how generated UI works on 1.0, and why it is better, using one currency agent built on both versions. A Google ADK agent on Gemini looks up exchange rates and answers with A2UI cards and charts, rendered by a Next.js CopilotKit front end over AG-UI.
 

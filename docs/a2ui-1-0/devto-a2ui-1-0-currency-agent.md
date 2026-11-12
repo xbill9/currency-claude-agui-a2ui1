@@ -1,5 +1,5 @@
 ---
-title: "A2UI 1.0 vs 0.9: What Changed, and Why It Is Better"
+title: "What Changes With the A2UI 1.0 Release"
 published: false
 description: "The same currency agent built on A2UI 0.9 and on A2UI 1.0: what changed in the protocol, how an answer reaches the screen now, and why the model writes 21 tokens for a rate card that took 223 on 0.9."
 tags: a2ui, agents, gemini, react
