@@ -1,13 +1,13 @@
-A2UI 1.0 in a Currency Agent: One Message per Surface, Mixed Catalogs and Server-Side Macros
+A2UI 1.0 vs 0.9: What Changed, and Why It Is Better
 
-A Google ADK currency agent moves from A2UI 0.9 to A2UI 1.0: what changed in the protocol, what 1.0 can do that 0.9 could not, and how server-side macros let the model write one line while the server fills in the rates.
+The same currency agent built on A2UI 0.9 and on A2UI 1.0: what changed in the protocol, how an answer reaches the screen now, and why the model writes 21 tokens for a rate card that took 223 on 0.9.
 
 What is in it:
 
-- 🟢 For a conversion the model wrote one line, root = RateCard("USD", "EUR", 100), and the browser received six Basic 1.0 components with the live rate in one createSurface
-- 🟢 Ten prompts, ten runs each: 100 of 100 replies rendered clean on gemini-3.8-flash and 100 of 100 on gemini-2.5-flash
-- 🟢 Comparisons came from RateComparison in 60 of 60 runs across both models, with no rate-tool call, charted as percent change from a zero line
-- 🟢 A2UI written as reply text rendered as UI through the safety net; with the net off it showed as raw text in 5 of 5 runs
+- 🟢 A rate card is 223 tokens of 0.9 JSON, 139 tokens of Express and 21 tokens as a macro call, counted by the Gemini tokenizer
+- 🟢 A 90-day chart is 1,060 tokens of 0.9 JSON and 21 as a macro call; Express alone saves little when the tokens are data
+- 🟢 The same Express block compiles to one message on 1.0 and three on 0.9
+- 🟢 One surface mixed two catalogs, each component naming its own catalogId
 
 dev.to (Google Developer Experts): PENDING
 AWS Builder Center: PENDING

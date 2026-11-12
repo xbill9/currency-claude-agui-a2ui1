@@ -1,0 +1,8 @@
+# Rust port (github.com/xbill9/currency-agent-rust-agui-a2ui1, commit bcfa657) against the upstream Express conformance suites, run 2026-11-11
+$ cargo test --test express_conformance -- --nocapture
+agent/express/response_parser.yaml: 38/38 passed, 0 known gaps, 0 failed
+  KNOWN GAP test_compile_express_unreferenced_variable_holding_a_system_function_before_v1_0_is_a_validation_error: uses a v0.9 catalog; the port targets protocol v1.0 only
+  KNOWN GAP test_compile_express_index_system_function_before_v1_0_is_a_validation_error: uses a v0.9 catalog; the port targets protocol v1.0 only
+  KNOWN GAP test_compile_express_event_user_message_before_v1_is_a_validation_error: uses a v0.9 catalog; the port targets protocol v1.0 only
+agent/express/compiler.yaml: 132/135 passed, 3 known gaps, 0 failed
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s

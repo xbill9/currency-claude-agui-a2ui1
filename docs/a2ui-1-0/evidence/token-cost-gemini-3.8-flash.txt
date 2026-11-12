@@ -1,0 +1,61 @@
+# Tokens the model writes for the same UI, counted by gemini-3.8-flash countTokens
+| Answer | Components | 0.9 JSON | 1.0 JSON | 1.0 Express | 1.0 macro |
+| :--- | ---: | ---: | ---: | ---: | ---: |
+| Rate card | 6 | 223 | 212 | 139 | 21 |
+| 90-day chart | 5 | 1060 | 1152 | 1101 | 21 |
+| 3-currency comparison | 8 | 347 | 522 | 253 | 22 |
+
+## Rate card
+### 0.9 JSON (692 chars)
+[{"version":"v0.9","createSurface":{"surfaceId":"main","catalogId":"https://a2ui.org/catalog/currency-charts"}},{"version":"v0.9","updateComponents":{"surfaceId":"main","components":[{"component":"Text","id":"root__text_1","text":"100.00 USD = 89.87 EUR","variant":"h3"},{"component":"Text","id":"root__text_2","text":"1 USD = 0.89871 EUR"},{"component":"Divider","id":"root__divider_1"},{"component":"Text","id":"root__text_3","text":"ECB reference rate for 2026-11-11 (Frankfurter API)","variant":"caption"},{"component":"Column","id":"root__column_1","children":["root__text_1","root__text_2","root__divider_1","root__text_3"]},{"component":"Card","id":"root","child":"root__column_1"}]}}]
+### 1.0 JSON (644 chars)
+[{"version":"1.0","createSurface":{"surfaceId":"main","catalogId":"https://a2ui.org/specification/v1_0/catalogs/basic/catalog.json","components":[{"component":"Text","id":"root__text_1","text":"### 100.00 USD = 89.87 EUR"},{"component":"Text","id":"root__text_2","text":"1 USD = 0.89871 EUR"},{"component":"Divider","id":"root__divider_1"},{"component":"Text","id":"root__text_3","text":"ECB reference rate for 2026-11-11 (Frankfurter API)","variant":"caption"},{"component":"Column","id":"root__column_1","children":["root__text_1","root__text_2","root__divider_1","root__text_3"]},{"component":"Card","id":"root","child":"root__column_1"}]}}]
+### 1.0 Express (335 chars)
+surface("main")
+root__text_1 = Text("### 100.00 USD = 89.87 EUR")
+root__text_2 = Text("1 USD = 0.89871 EUR")
+root__divider_1 = Divider()
+root__text_3 = Text("ECB reference rate for 2026-11-11 (Frankfurter API)", "caption")
+root__column_1 = Column([root__text_1, root__text_2, root__divider_1, root__text_3])
+root = Card(root__column_1)
+### 1.0 macro (51 chars)
+surface("main")
+root = RateCard("USD", "EUR", 100)
+
+
+## 90-day chart
+### 0.9 JSON (1630 chars)
+[{"version":"v0.9","createSurface":{"surfaceId":"main","catalogId":"https://a2ui.org/catalog/currency-charts"}},{"version":"v0.9","updateComponents":{"surfaceId":"main","components":[{"component":"Text","id":"root__text_1","text":"USD → JPY, last 90 days","variant":"h3"},{"component":"LineChart","id":"root__linechart_1","title":"USD/JPY (2026-08-14 to 2026-11-11)","labels":["08-14","08-17","08-18","08-19","08-20","08-21","08-24","08-25","08-26","08-27","08-28","08-31","09-01","09-02","09-03","09-04","09-07","09-08","09-09","09-10","09-11","09-14","09-15","09-16","09-17","09-18","09-21","09-22","09-23","09-24","09-25","09-28","09-29","09-30","10-01","10-02","10-05","10-06","10-07","10-08","10-09","10-12","10-13","10-14","10-15","10-16","10-19","10-20","10-21","10-22","10-23","10-26","10-27","10-28","10-29","10-30","11-02","11-03","11-04","11-05","11-06","11-09","11-10","11-11"],"values":[159.01,159.23,159.7,159.09,158.76,158.7,159.12,159.24,159.07,159.39,159.68,159.73,160.16,159.6,156.01,156.25,154.75,154.3,153.27,154.18,154.04,154.55,155.0,155.05,155.69,157.89,157.27,157.18,157.92,158.85,157.59,156.88,157.12,157.0,157.98,157.67,158.23,158.09,158.23,158.28,158.25,158.6,158.12,158.45,157.98,158.02,158.24,158.13,157.88,157.05,156.8,157.45,157.82,157.96,158.06,157.25,157.9,158.29,158.25,158.46,158.33,157.95,158.18,159.23]},{"component":"Text","id":"root__text_2","text":"Low 153.27000 · High 160.16000 · Latest 159.23000","variant":"caption"},{"component":"Column","id":"root__column_1","children":["root__text_1","root__linechart_1","root__text_2"]},{"component":"Card","id":"root","child":"root__column_1"}]}}]
+### 1.0 JSON (1887 chars)
+[{"version":"1.0","createSurface":{"surfaceId":"main","components":[{"component":"Text","id":"root__text_1","text":"### USD → JPY, last 90 days","catalogId":"https://a2ui.org/specification/v1_0/catalogs/basic/catalog.json"},{"component":"LineChart","id":"root__linechart_1","title":"USD/JPY (2026-08-14 to 2026-11-11)","labels":["08-14","08-17","08-18","08-19","08-20","08-21","08-24","08-25","08-26","08-27","08-28","08-31","09-01","09-02","09-03","09-04","09-07","09-08","09-09","09-10","09-11","09-14","09-15","09-16","09-17","09-18","09-21","09-22","09-23","09-24","09-25","09-28","09-29","09-30","10-01","10-02","10-05","10-06","10-07","10-08","10-09","10-12","10-13","10-14","10-15","10-16","10-19","10-20","10-21","10-22","10-23","10-26","10-27","10-28","10-29","10-30","11-02","11-03","11-04","11-05","11-06","11-09","11-10","11-11"],"values":[159.01,159.23,159.7,159.09,158.76,158.7,159.12,159.24,159.07,159.39,159.68,159.73,160.16,159.6,156.01,156.25,154.75,154.3,153.27,154.18,154.04,154.55,155.0,155.05,155.69,157.89,157.27,157.18,157.92,158.85,157.59,156.88,157.12,157.0,157.98,157.67,158.23,158.09,158.23,158.28,158.25,158.6,158.12,158.45,157.98,158.02,158.24,158.13,157.88,157.05,156.8,157.45,157.82,157.96,158.06,157.25,157.9,158.29,158.25,158.46,158.33,157.95,158.18,159.23],"catalogId":"https://a2ui.org/catalog/currency-charts/v1/catalog.json"},{"component":"Text","id":"root__text_2","text":"Low 153.27000 · High 160.16000 · Latest 159.23000","variant":"caption","catalogId":"https://a2ui.org/specification/v1_0/catalogs/basic/catalog.json"},{"component":"Column","id":"root__column_1","children":["root__text_1","root__linechart_1","root__text_2"],"catalogId":"https://a2ui.org/specification/v1_0/catalogs/basic/catalog.json"},{"component":"Card","id":"root","child":"root__column_1","catalogId":"https://a2ui.org/specification/v1_0/catalogs/basic/catalog.json"}]}}]
+### 1.0 Express (1402 chars)
+surface("main")
+root__text_1 = Text("### USD → JPY, last 90 days")
+root__linechart_1 = LineChart("USD/JPY (2026-08-14 to 2026-11-11)", ["08-14", "08-17", "08-18", "08-19", "08-20", "08-21", "08-24", "08-25", "08-26", "08-27", "08-28", "08-31", "09-01", "09-02", "09-03", "09-04", "09-07", "09-08", "09-09", "09-10", "09-11", "09-14", "09-15", "09-16", "09-17", "09-18", "09-21", "09-22", "09-23", "09-24", "09-25", "09-28", "09-29", "09-30", "10-01", "10-02", "10-05", "10-06", "10-07", "10-08", "10-09", "10-12", "10-13", "10-14", "10-15", "10-16", "10-19", "10-20", "10-21", "10-22", "10-23", "10-26", "10-27", "10-28", "10-29", "10-30", "11-02", "11-03", "11-04", "11-05", "11-06", "11-09", "11-10", "11-11"], [159.01, 159.23, 159.7, 159.09, 158.76, 158.7, 159.12, 159.24, 159.07, 159.39, 159.68, 159.73, 160.16, 159.6, 156.01, 156.25, 154.75, 154.3, 153.27, 154.18, 154.04, 154.55, 155.0, 155.05, 155.69, 157.89, 157.27, 157.18, 157.92, 158.85, 157.59, 156.88, 157.12, 157.0, 157.98, 157.67, 158.23, 158.09, 158.23, 158.28, 158.25, 158.6, 158.12, 158.45, 157.98, 158.02, 158.24, 158.13, 157.88, 157.05, 156.8, 157.45, 157.82, 157.96, 158.06, 157.25, 157.9, 158.29, 158.25, 158.46, 158.33, 157.95, 158.18, 159.23])
+root__text_2 = Text("Low 153.27000 · High 160.16000 · Latest 159.23000", "caption")
+root__column_1 = Column([root__text_1, root__linechart_1, root__text_2])
+root = Card(root__column_1)
+### 1.0 macro (58 chars)
+surface("main")
+root = RateHistoryChart("USD", "JPY", 90)
+
+
+## 3-currency comparison
+### 0.9 JSON (1003 chars)
+[{"version":"v0.9","createSurface":{"surfaceId":"main","catalogId":"https://a2ui.org/catalog/currency-charts"}},{"version":"v0.9","updateComponents":{"surfaceId":"main","components":[{"component":"Text","id":"root__text_1","text":"1 USD against 3 currencies","variant":"h3"},{"component":"Text","id":"root__text_2","text":"1 USD = 0.89871 EUR"},{"component":"Text","id":"root__text_3","text":"1 USD = 0.75149 GBP"},{"component":"Text","id":"root__text_4","text":"1 USD = 0.82987 CHF"},{"component":"BarChart","id":"root__barchart_1","title":"Change in the USD rate, 2026-10-13 to 2026-11-11 (%)","labels":["EUR","GBP","CHF"],"values":[0.55,-0.45,-0.29],"decimals":2},{"component":"Text","id":"root__text_5","text":"ECB reference rates for 2026-11-11 (Frankfurter API)","variant":"caption"},{"component":"Column","id":"root__column_1","children":["root__text_1","root__text_2","root__text_3","root__text_4","root__barchart_1","root__text_5"]},{"component":"Card","id":"root","child":"root__column_1"}]}}]
+### 1.0 JSON (1494 chars)
+[{"version":"1.0","createSurface":{"surfaceId":"main","components":[{"component":"Text","id":"root__text_1","text":"### 1 USD against 3 currencies","catalogId":"https://a2ui.org/specification/v1_0/catalogs/basic/catalog.json"},{"component":"Text","id":"root__text_2","text":"1 USD = 0.89871 EUR","catalogId":"https://a2ui.org/specification/v1_0/catalogs/basic/catalog.json"},{"component":"Text","id":"root__text_3","text":"1 USD = 0.75149 GBP","catalogId":"https://a2ui.org/specification/v1_0/catalogs/basic/catalog.json"},{"component":"Text","id":"root__text_4","text":"1 USD = 0.82987 CHF","catalogId":"https://a2ui.org/specification/v1_0/catalogs/basic/catalog.json"},{"component":"BarChart","id":"root__barchart_1","title":"Change in the USD rate, 2026-10-13 to 2026-11-11 (%)","labels":["EUR","GBP","CHF"],"values":[0.55,-0.45,-0.29],"decimals":2,"catalogId":"https://a2ui.org/catalog/currency-charts/v1/catalog.json"},{"component":"Text","id":"root__text_5","text":"ECB reference rates for 2026-11-11 (Frankfurter API)","variant":"caption","catalogId":"https://a2ui.org/specification/v1_0/catalogs/basic/catalog.json"},{"component":"Column","id":"root__column_1","children":["root__text_1","root__text_2","root__text_3","root__text_4","root__barchart_1","root__text_5"],"catalogId":"https://a2ui.org/specification/v1_0/catalogs/basic/catalog.json"},{"component":"Card","id":"root","child":"root__column_1","catalogId":"https://a2ui.org/specification/v1_0/catalogs/basic/catalog.json"}]}}]
+### 1.0 Express (562 chars)
+surface("main")
+root__text_1 = Text("### 1 USD against 3 currencies")
+root__text_2 = Text("1 USD = 0.89871 EUR")
+root__text_3 = Text("1 USD = 0.75149 GBP")
+root__text_4 = Text("1 USD = 0.82987 CHF")
+root__barchart_1 = BarChart("Change in the USD rate, 2026-10-13 to 2026-11-11 (%)", ["EUR", "GBP", "CHF"], [0.55, -0.45, -0.29], _, 2)
+root__text_5 = Text("ECB reference rates for 2026-11-11 (Frankfurter API)", "caption")
+root__column_1 = Column([root__text_1, root__text_2, root__text_3, root__text_4, root__barchart_1, root__text_5])
+root = Card(root__column_1)
+### 1.0 macro (68 chars)
+surface("main")
+root = RateComparison("USD", ["EUR", "GBP", "CHF"])
+
