@@ -9,7 +9,7 @@ What is in it:
 - 🟢 The same Express block compiles to one message on 1.0 and three on 0.9
 - 🟢 One surface mixed two catalogs, each component naming its own catalogId
 
-dev.to (Google Developer Experts): PENDING
-AWS Builder Center: PENDING
-Medium: PENDING
+dev.to (Google Developer Experts): https://dev.to/gde/what-changes-with-the-a2ui-10-release-31eo
+Medium: https://xbill999.medium.com/what-changes-with-the-a2ui-1-0-release-694be0ac3140
+Substack: https://xbill9.substack.com/p/what-changes-with-the-a2ui-10-release
 GitHub: https://github.com/xbill9/currency-claude-agui-a2ui1
